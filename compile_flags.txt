@@ -1,0 +1,14 @@
+-I
+stoff2d/include
+-I
+stoff2d/src
+-I
+stoff2d/vendor/include
+-I
+stoff2d/vendor/src
+-I
+project/include
+-I
+project/src
+-I
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.19041.0\ucrt

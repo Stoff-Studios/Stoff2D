@@ -1,0 +1,29 @@
+#pragma once
+
+// Res folders.
+#define S2D_TEXTURE_FOLDER "../res/textures/"
+#define S2D_SHADER_FOLDER  "../res/shaders/"
+#define S2D_ANIMATION_FILE "../res/animations/animations.ani"
+
+
+// Animation.
+#define S2D_MAX_ANIMATION_NAME_LEN   32
+#define S2D_MAX_ANIMATION_FRAMES     16
+#define S2D_MAX_ANIMATION_TABLE_SIZE 1039
+
+
+// Window.
+#define S2D_VSYNC 0 // 0 -> off, 1 -> on
+
+
+// Camera.
+#define S2D_MAX_ZOOM 4000 
+#define S2D_MIN_ZOOM 10
+
+
+// Debug.
+#define S2D_LOG_STATS_INTERVAL 1.0f // 1 second.
+
+
+// ECS
+#define MAX_ENTITIES 10000
