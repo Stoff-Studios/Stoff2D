@@ -1,6 +1,7 @@
 #pragma once
 
-#include <stoff2d.h>
+#include <defines.h>
+#include <component.h>
 
 /* The purpose of this is to order sprites by layer so we can render them in
  * the correct order without having to worry about it.

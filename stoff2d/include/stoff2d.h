@@ -7,13 +7,12 @@
  * Property of Stoff-Studios pty ltd. You will be sued.
  */
 
-#include <defines.h>         // Types and flags.
+#include <defines.h>         // Types, keycodes and flags.
 #include <settings.h>        // Settings.
-#include <clm/clm.h>             // Linear algebra.
-#include <animation.h>       // Animation loading and retrieval.
+#include <clm/clm.h>         // Linear algebra.
 #include <ecs.h>             // Entity Component System.
 #include <sprite_renderer.h> // Layered sprite rendering.
-
+#include <particle.h>        // Particle system.
 
 /****************************** Init/Shutdown ********************************/
 
@@ -30,22 +29,33 @@ bool s2d_initialise_engine(const char* programName);
  */
 void s2d_shutdown_engine();
 
+/*****************************************************************************/
+
 
 /******************************** Rendering **********************************/
 
 /* s2d_render_quad
  * ---------------
  * Render a textured quad.
- * For optimal performace, group render calls by texture.
+ * For optimal performance, group render calls by texture.
  *
  * To render an entire texture, frame = { 0, 0, 1, 1 }
  */
 void s2d_render_quad(
         clmVec2 position,
         clmVec2 size,
+        clmVec4 colour,
         u32     texture,
         Frame   frame);
 
+/* s2d_render_coloured_quad
+ * ------------------------
+ * Render a coloured quad.
+ */
+void s2d_render_coloured_quad(
+        clmVec2 position,
+        clmVec2 size,
+        clmVec4 colour);
 
 /* s2d_load_texture
  * ----------------
@@ -53,6 +63,8 @@ void s2d_render_quad(
  * Textures must be png's located in S2D_TEXTURE_FOLDER.
  */
 u32 s2d_load_texture(const char* fileName);
+
+/*****************************************************************************/
 
 
 /***************************** Start/End Frame *******************************/
@@ -63,13 +75,13 @@ u32 s2d_load_texture(const char* fileName);
  */
 f32 s2d_start_frame();
 
-
 /* s2d_end_frame
  * -------------
  * Finish the current frame.
  */
 void s2d_end_frame();
 
+/*****************************************************************************/
 
 /********************************** Flags ************************************/
 
@@ -95,6 +107,7 @@ void s2d_set_flags(u32 flagsToTurnOn);
  */
 void s2d_unset_flags(u32 flagsToTurnOff);
 
+/*****************************************************************************/
 
 /********************************* Window ************************************/
 
@@ -117,20 +130,22 @@ void s2d_window_windowed();
  */
 bool s2d_keydown(u32 key);
 
-
-/********************************* Camera ************************************/
-
-/* s2d_camera_move
- * ---------------
- * Move the camera along the x/y plane.
+/* s2d_mouse_pos
+ * -------------
+ * Return the current position of the mouse in screen coordinates.
  */
-void s2d_camera_move(f32 dx, f32 dy);
+clmVec2 s2d_mouse_pos();
 
-/* s2d_camera_zoom
- * ---------------
- * Zoom the camera by dz.
+/* s2d_mouse_world_pos
+ * -------------------
+ * Return the current position of the mouse in world coordinates.
  */
-void s2d_camera_zoom(f32 dz);
+clmVec2 s2d_mouse_world_pos();
+
+/*****************************************************************************/
+
+
+/********************************** Camera ***********************************/
 
 /* s2d_camera_get_pos
  * ------------------
@@ -143,3 +158,36 @@ clmVec2 s2d_camera_get_pos();
  * Set the current position of the camera.
  */
 void s2d_camera_set_pos(clmVec2 position);
+
+/* s2d_camera_move
+ * ---------------
+ * Move the position of the camera by dx/dy along the x/y plane.
+ */
+void s2d_camera_move(f32 dx, f32 dy);
+
+/* s2d_camera_zoom
+ * ---------------
+ * Zoom the camera by dz. Increasing zoom zooms out.
+ */
+void s2d_camera_zoom(f32 dz);
+
+/* s2d_camera_zoom
+ * ---------------
+ * Set the zoom level to z.
+ */
+void s2d_camera_set_zoom(f32 z);
+
+/*****************************************************************************/
+
+
+/******************************* Animation ***********************************/
+
+/* animations_get
+ * --------------
+ * Retrieve a reference to the animation with key: name.
+ * Animations are loaded from res/animations/animations.ani
+ * Look at README.ani to learn how to add animations in the above file.
+ */
+Animation* s2d_animations_get(char* name);
+
+/*****************************************************************************/

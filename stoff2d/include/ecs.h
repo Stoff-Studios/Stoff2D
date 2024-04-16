@@ -1,6 +1,5 @@
 #pragma once
 
-#include <component.h>
 #include <component_map.h>
 
 /* ecs_create_entity

@@ -11,6 +11,11 @@
 typedef struct {
     bool running;
     u32 mcTex;
+    ParticleData fireParticles;
+    ParticleData bloodParticles;
+    ParticleData waterParticles;
+    ParticleData partyParticles;
+    ParticleData smokeParticles;
 } GameData;
 
 GameData gData;
@@ -35,6 +40,26 @@ void game_update(f32 timeStep) {
     }
     if (s2d_keydown(S2D_KEY_D)) {
         s2d_camera_move(camSpeed * timeStep, 0);
+    }
+    if (s2d_keydown(S2D_KEY_P)) {
+        gData.fireParticles.position = s2d_mouse_world_pos();
+        s2d_particles_add(&gData.fireParticles);
+    }
+    if (s2d_keydown(S2D_KEY_L)) {
+        gData.bloodParticles.position = s2d_mouse_world_pos();
+        s2d_particles_add(&gData.bloodParticles);
+    }
+    if (s2d_keydown(S2D_KEY_K)) {
+        gData.waterParticles.position = s2d_mouse_world_pos();
+        s2d_particles_add(&gData.waterParticles);
+    }
+    if (s2d_keydown(S2D_KEY_J)) {
+        gData.partyParticles.position = s2d_mouse_world_pos();
+        s2d_particles_add(&gData.partyParticles);
+    }
+    if (s2d_keydown(S2D_KEY_M)) {
+        gData.smokeParticles.position = s2d_mouse_world_pos();
+        s2d_particles_add(&gData.smokeParticles);
     }
     system_move(timeStep);
     system_render();
@@ -87,6 +112,67 @@ void game_init() {
     }
 
     s2d_ecs_print_components();
+
+    // Particles test.
+    gData.fireParticles = (ParticleData) {
+        .count    = 1,
+        .lifeTime = 1.0f,
+        .position      = (clmVec2) { 0.0f, 0.0f },
+        .lowerVelocity = (clmVec2) { -20.0f, -5.0f },
+        .upperVelocity = (clmVec2) {  20.0f, 50.0f },
+        .lowerSize     = (clmVec2) { 1.0f, 1.0f },
+        .upperSize     = (clmVec2) { 2.0f, 2.0f },
+        .birthColour   = (clmVec4) { 0.8f, 0.0f, 0.0f, 1.0f },
+        .deathColour   = (clmVec4) { 0.0f, 0.0f, 0.0f, 0.0f }
+    };
+
+    gData.bloodParticles = (ParticleData) {
+        .count    = 1,
+        .lifeTime = 0.5f,
+        .position      = (clmVec2) { 0.0f, 0.0f },
+        .lowerVelocity = (clmVec2) { -50.0f, -50.0f },
+        .upperVelocity = (clmVec2) {  50.0f, 50.0f },
+        .lowerSize     = (clmVec2) { 0.5f, 0.5f },
+        .upperSize     = (clmVec2) { 1.0f, 1.0f },
+        .birthColour   = (clmVec4) { 0.4f, 0.0f, 0.0f, 1.0f },
+        .deathColour   = (clmVec4) { 1.0f, 0.0f, 0.0f, 0.0f }
+    };
+
+    gData.waterParticles = (ParticleData) {
+        .count    = 1,
+        .lifeTime = 1.0f,
+        .position      = (clmVec2) { 0.0f, 0.0f },
+        .lowerVelocity = (clmVec2) { -2.0f, -20.0f },
+        .upperVelocity = (clmVec2) {  2.0f, 0.0f },
+        .lowerSize     = (clmVec2) { 1.0f, 1.0f },
+        .upperSize     = (clmVec2) { 2.0f, 2.0f },
+        .birthColour   = (clmVec4) { 0.0f, 0.0f, 0.5f, 1.0f },
+        .deathColour   = (clmVec4) { 0.0f, 0.0f, 1.0f, 0.0f }
+    };
+
+    gData.partyParticles = (ParticleData) {
+        .count    = 2,
+        .lifeTime = 2.0f,
+        .position      = (clmVec2) { 0.0f, 0.0f },
+        .lowerVelocity = (clmVec2) { -50.0f, -50.0f },
+        .upperVelocity = (clmVec2) {  50.0f, 50.0f },
+        .lowerSize     = (clmVec2) { 1.0f, 1.0f },
+        .upperSize     = (clmVec2) { 50.0f, 50.0f },
+        .birthColour   = (clmVec4) { 1.0f, 0.0f, 1.0f, 1.0f },
+        .deathColour   = (clmVec4) { 0.0f, 1.0f, 1.0f, 0.0f }
+    };
+
+    gData.smokeParticles = (ParticleData) {
+        .count    = 2,
+        .lifeTime = 1.5f,
+        .position      = (clmVec2) { 0.0f, 0.0f },
+        .lowerVelocity = (clmVec2) { -50.0f, -2.0f },
+        .upperVelocity = (clmVec2) {  50.0f, 20.0f },
+        .lowerSize     = (clmVec2) { 2.0f, 2.0f },
+        .upperSize     = (clmVec2) { 5.0f, 5.0f },
+        .birthColour   = (clmVec4) { 0.15f, 0.1f, 0.1f, 1.0f },
+        .deathColour   = (clmVec4) { 0.8f, 0.8f, 0.8f, 0.0f }
+    };
 
     gData.running = true;
 }

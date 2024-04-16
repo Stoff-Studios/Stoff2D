@@ -32,6 +32,7 @@ void s2d_sprite_renderer_render_sprites() {
         s2d_render_quad(
                 sprite->position,
                 sprite->sprite.size,
+                (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
                 sprite->sprite.texture,
                 sprite->sprite.frame);
     }

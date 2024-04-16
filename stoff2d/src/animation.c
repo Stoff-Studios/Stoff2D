@@ -1,4 +1,4 @@
-#include <animation.h>
+#include <defines.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -6,7 +6,6 @@
 
 #define LINE_BUFFER_SIZE 100
 #define MAX_ENTRIES (S2D_MAX_ANIMATION_TABLE_SIZE / 2)
-
 
 typedef struct {
     // Key.
@@ -20,6 +19,7 @@ typedef struct {
 
 HashEntry animations[S2D_MAX_ANIMATION_TABLE_SIZE];
 u64       animationsCount = 0;
+
 
 // djb2 hash.
 u64 hash_str(char* key) {
@@ -87,6 +87,36 @@ void print_table() {
     printf("TABLE END\n");
 }
 
+void animations_put(char* name, Animation animation) {
+    // Don't allow load factor to creep over 50%. 
+    if (animationsCount == MAX_ENTRIES) {
+        fprintf(stderr, 
+                "Exceeded animation limit of %d when trying to add animation:"
+                " %s, increase MAX_ANIMATION_TABLE_SIZE to a higher prime number"
+                " in settings.h if you need more space for animations\n",
+                MAX_ENTRIES, name);
+        return;
+    }
+
+    u64 hash  = hash_str(name);
+    u64 index = hash % S2D_MAX_ANIMATION_TABLE_SIZE;
+    HashEntry* entry = &animations[index];
+
+    // Quadratic probe until we find an empty slot.
+    u64 probe = 1;
+    while(!entry->empty) {
+        index = (hash + (probe * probe)) % S2D_MAX_ANIMATION_TABLE_SIZE;
+        entry = &animations[index];
+        probe++;
+    }
+
+    // Insert the data into the free slot.
+    strcpy(entry->name, name);
+    memcpy(&entry->animation, &animation, sizeof(Animation));
+    entry->empty = false;
+    animationsCount++;
+}
+
 void parse_ani_file() {
     FILE* aniFile = fopen(S2D_ANIMATION_FILE, "r");
     if (!aniFile) {
@@ -144,13 +174,13 @@ void parse_ani_file() {
                     animation.frames[animation.frameCount++] = frame;
                 }
             }
-            s2d_animations_put(name, animation);
+            animations_put(name, animation);
         }
     }
     fclose(aniFile);
 }
 
-void s2d_animations_init() {
+void animations_init() {
     // Set each entry to be an empty slot.
     for (u32 i = 0; i < S2D_MAX_ANIMATION_TABLE_SIZE; i++) {
         HashEntry* entry = &animations[i];
@@ -159,36 +189,6 @@ void s2d_animations_init() {
         entry->empty = true;
     }
     parse_ani_file();
-}
-
-void s2d_animations_put(char* name, Animation animation) {
-    // Don't allow load factor to creep over 50%. 
-    if (animationsCount == MAX_ENTRIES) {
-        fprintf(stderr, 
-                "Exceeded animation limit of %d when trying to add animation:"
-                " %s, increase MAX_ANIMATION_TABLE_SIZE to a higher prime number"
-                " in settings.h if you need more space for animations\n",
-                MAX_ENTRIES, name);
-        return;
-    }
-
-    u64 hash  = hash_str(name);
-    u64 index = hash % S2D_MAX_ANIMATION_TABLE_SIZE;
-    HashEntry* entry = &animations[index];
-
-    // Quadratic probe until we find an empty slot.
-    u64 probe = 1;
-    while(!entry->empty) {
-        index = (hash + (probe * probe)) % S2D_MAX_ANIMATION_TABLE_SIZE;
-        entry = &animations[index];
-        probe++;
-    }
-
-    // Insert the data into the free slot.
-    strcpy(entry->name, name);
-    memcpy(&entry->animation, &animation, sizeof(Animation));
-    entry->empty = false;
-    animationsCount++;
 }
 
 Animation* s2d_animations_get(char* name) {

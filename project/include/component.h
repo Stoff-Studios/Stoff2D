@@ -1,7 +1,6 @@
 #pragma once
 
 #include <defines.h>
-#include <animation.h>
 
 // 0 is reserved as error value
 #define NO_ENTITY 0 

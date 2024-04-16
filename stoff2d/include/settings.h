@@ -25,5 +25,14 @@
 #define S2D_LOG_STATS_INTERVAL 1.0f // 1 second.
 
 
-// ECS
+// ECS.
 #define MAX_ENTITIES 10000
+
+
+// Particles.
+#define MAX_PARTICLES 100000
+
+
+// Camera.
+#define S2D_CAM_INITIAL_ZOOM 200.0f
+#define S2D_CAM_UP           ((clmVec3) { 0.0f, 1.0f, 0.0f })

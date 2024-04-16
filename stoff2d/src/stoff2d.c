@@ -33,33 +33,46 @@ typedef struct {
     u32         indicesCount;
     u32         verticesCount;
     u32         lastTexture;
-
-    // Camera
-    f32         camZoom;
-    clmVec3     camPos;
-    clmVec3     camUp;
+    u32         whiteTex;
 
     // Time
     f64         lastTime;
     f32         timeStep;
 
+    // Camera.
+    f32     camZoom;
+    clmVec3 camPos;
+    clmVec3 camUp;
+
     // Debugging.
     f32 logStatsTimer;
     u32 drawCalls;
-} s2d_Engine;
+} EngineData;
 
-static s2d_Engine engine;
+EngineData engine;
+
+/********************************* HELPERS ***********************************/
 
 // Stats logging.
 void log_stats();
 
-// Callbacks
+// Callbacks.
 void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height);
 
-// Renderer helpers.
-void initialise_renderer();
+// Renderer.
+void renderer_init();
 u32  load_texture(const char* fileName);
 void render_flush();
+
+// Camera.
+void    camera_init();
+clmMat4 camera_view();
+clmMat4 camera_projection();
+
+// Animation.
+void animations_init();
+
+/*****************************************************************************/
 
 // Initialise engine.
 bool s2d_initialise_engine(const char* programName) {
@@ -80,9 +93,7 @@ bool s2d_initialise_engine(const char* programName) {
     engine.aspectRatio = ((f32) engine.winWidth) / ((f32) engine.winHeight);
 
     // Camera.
-    engine.camZoom  = 200.0f;
-    engine.camPos   = (clmVec3) { 0.0f, 0.0f, 1.0f };
-    engine.camUp    = (clmVec3) { 0.0f, 1.0f, 0.0f };
+    camera_init();
 
     // Time.
     engine.lastTime = glfwGetTime();
@@ -124,21 +135,29 @@ bool s2d_initialise_engine(const char* programName) {
 
     glViewport(0, 0, engine.winWidth, engine.winHeight);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
-    // Initialize Renderer.
-    initialise_renderer();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Set Callbacks.
     glfwSetFramebufferSizeCallback(engine.winPtr, framebuffer_size_callback);
 
-    // Load animations from animations.ani
-    s2d_animations_init();
+    // Initialise Renderer.
+    renderer_init();
+
+    // Load animations.
+    animations_init();
 
     // Setup the sprite renderer.
     sprite_renderer_init();
 
+    // Initialise particle system.
+    particles_init();
+
     // Initialise the ecs.
     ecs_init();
+
+    // Load white texture for coloured quads.
+    engine.whiteTex = s2d_load_texture("white.png");
 
     // All is well so start the application.
     engine.flags = S2D_RUNNING;
@@ -173,27 +192,21 @@ f32 s2d_start_frame() {
     shader_set_uniform_mat4(
             engine.quadShader,
             "proj",
-            clm_mat4_ortho(
-               -engine.camZoom * engine.aspectRatio,
-                engine.camZoom * engine.aspectRatio,
-               -engine.camZoom,
-                engine.camZoom,
-                0.1f,
-                100.0f));
+            camera_projection());
 
     // View (lookat)
     shader_set_uniform_mat4(
             engine.quadShader,
             "view",
-            clm_mat4_lookat(
-                engine.camPos,
-                (clmVec3) { engine.camPos.x, engine.camPos.y, -1.0f },
-                engine.camUp));
+            camera_view());
+
+    particles_update(engine.timeStep);
 
     return engine.timeStep;
 }
 
 void s2d_end_frame() {
+    particles_render();
     render_flush();
     glfwSwapBuffers(engine.winPtr);
 
@@ -210,6 +223,7 @@ void render_flush() {
     shader_use(engine.quadShader);
     glBindTexture(GL_TEXTURE_2D, engine.lastTexture);
     glBindVertexArray(engine.vao);
+    glBindVertexArray(engine.vbo);
     glBufferSubData(
             GL_ARRAY_BUFFER,
             0,
@@ -231,6 +245,7 @@ void render_flush() {
 void s2d_render_quad(
         clmVec2 position, 
         clmVec2 size, 
+        clmVec4 colour,
         u32     texture,  
         Frame   frame) {
     // Flush upon filling up the buffer or texture change.
@@ -244,6 +259,7 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y;
     engine.currentVertex->texCoord.x = frame.x;
     engine.currentVertex->texCoord.y = frame.y;
+    engine.currentVertex->colour = colour;
     engine.currentVertex++;
 
     // Bottom-right.
@@ -251,6 +267,7 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y;
     engine.currentVertex->texCoord.x = frame.x + frame.w;
     engine.currentVertex->texCoord.y = frame.y;
+    engine.currentVertex->colour = colour;
     engine.currentVertex++;
 
     // Top-right.
@@ -258,6 +275,7 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y + size.y;
     engine.currentVertex->texCoord.x = frame.x + frame.w;
     engine.currentVertex->texCoord.y = frame.y + frame.h;
+    engine.currentVertex->colour = colour;
     engine.currentVertex++;
 
     // Top-left.
@@ -265,12 +283,25 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y + size.y;
     engine.currentVertex->texCoord.x = frame.x;
     engine.currentVertex->texCoord.y = frame.y + frame.h;
+    engine.currentVertex->colour = colour;
     engine.currentVertex++;
 
     // Increment our counts and update the last added texture.
     engine.indicesCount  += 6;
     engine.verticesCount += 4;
     engine.lastTexture = texture;
+}
+
+void s2d_render_coloured_quad(
+        clmVec2 position,
+        clmVec2 size,
+        clmVec4 colour) {
+    s2d_render_quad(
+            position,
+            size,
+            colour,
+            engine.whiteTex,
+            (Frame) {  0.0f, 0.0f, 1.0f, 1.0f });
 }
 
 void s2d_shutdown_engine() {
@@ -292,9 +323,7 @@ void s2d_unset_flags(u32 flagsToTurnOff) {
     engine.flags &= 0xffffffff ^ flagsToTurnOff;
 }
 
-
-
-void initialise_renderer() {
+void renderer_init() {
     // vao
     glGenVertexArrays(1, &engine.vao); 
     glBindVertexArray(engine.vao);
@@ -326,6 +355,15 @@ void initialise_renderer() {
             GL_FALSE,                             // normalise
             sizeof(Vertex),                       // stride
             (void*) offsetof(Vertex, texCoord));  // offset
+    // attribute 2, colour
+    glEnableVertexAttribArray(2);  
+    glVertexAttribPointer(
+            2,                                    // attribute no.
+            4,                                    // number of elements
+            GL_FLOAT,                             // data type of the elements
+            GL_FALSE,                             // normalise
+            sizeof(Vertex),                       // stride
+            (void*) offsetof(Vertex, colour));  // offset
 
     // ebo
     u32* indices = (u32*) malloc(S2D_MAX_INDICES * sizeof(u32));
@@ -348,16 +386,11 @@ void initialise_renderer() {
             GL_STATIC_DRAW); 
     free(indices);
 
-    // Unbind. Could leave bound since we are only using one buffer.
+    // Unbind.
     glBindVertexArray(0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Load shaders.
     engine.quadShader = shader_create("vQuad.glsl", "fQuad.glsl");
-
-    // Make sure the uniform sampler corresponds to correct slot.
-    shader_set_uniform_1i(engine.quadShader, "spriteSheet", 0);
-    glActiveTexture(GL_TEXTURE0);
 
     // Batch renderer stuff.
     engine.currentVertex = engine.vertices;
@@ -415,37 +448,30 @@ u32 s2d_load_texture(const char* fileName) {
     return texture;
 }
 
-
-/********************************* Camera ************************************/
-
-void s2d_camera_move(f32 dx, f32 dy) {
-    engine.camPos.x += dx;
-    engine.camPos.y += dy;
-}
-
-void s2d_camera_zoom(f32 dz) {
-    engine.camZoom += dz;
-    if (engine.camZoom > S2D_MAX_ZOOM) {
-        engine.camZoom = S2D_MAX_ZOOM;
-    } else if (engine.camZoom < S2D_MIN_ZOOM) {
-        engine.camZoom = S2D_MIN_ZOOM;
-    }
-}
-
-clmVec2 s2d_camera_get_pos() {
-    return (clmVec2) { engine.camPos.x, engine.camPos.y };
-}
-
-void s2d_camera_set_pos(clmVec2 position) {
-    engine.camPos.x = position.x;
-    engine.camPos.y = position.y;
-}
-
-
 /********************************* Window ************************************/
 
 bool s2d_keydown(u32 key) {
     return glfwGetKey(engine.winPtr, key) == GLFW_PRESS;
+}
+
+clmVec2 s2d_mouse_screen_pos() {
+    double x, y;
+    glfwGetCursorPos(engine.winPtr, &x, &y);
+    return (clmVec2) { x, engine.scrHeight - y };
+}
+
+clmVec2 s2d_mouse_world_pos() {
+    clmVec2 bottomLeft = (clmVec2) {
+        .x = engine.camPos.x - (engine.camZoom * engine.aspectRatio),
+        .y = engine.camPos.y - engine.camZoom
+    };
+    clmVec2 mousePos = s2d_mouse_screen_pos();
+    // Normalise the position of the mouse cursor in screen space, then multiply
+    // that by the width of the screen and add that to the bottom left world space.
+    return (clmVec2) {
+        .x = bottomLeft.x + (2.0f * engine.camZoom * engine.aspectRatio * (mousePos.x / ((f32) engine.scrWidth))),
+        .y = bottomLeft.y + (2.0f * engine.camZoom * (mousePos.y / ((f32) engine.scrHeight)))
+    };
 }
 
 void s2d_window_fullscreen() {
@@ -466,6 +492,8 @@ void s2d_window_windowed() {
             engine.refreshRate);
 }
 
+/*****************************************************************************/
+
 
 /******************************* Callbacks ***********************************/
 
@@ -476,7 +504,10 @@ void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height) {
     engine.aspectRatio = ((f32) engine.winWidth) / ((f32) engine.winHeight);
 }
 
-/********************************* Misc **************************************/
+/*****************************************************************************/
+
+
+/*********************************** Misc ************************************/
 
 void log_stats() {
     printf("--- STATS ---\n"
@@ -486,3 +517,60 @@ void log_stats() {
            1.0f / engine.timeStep,
            engine.drawCalls);
 }
+
+/*****************************************************************************/
+
+
+/********************************** Camera ***********************************/
+
+clmVec2 s2d_camera_get_pos() {
+    return (clmVec2) { engine.camPos.x, engine.camPos.y };
+}
+
+void s2d_camera_set_pos(clmVec2 position) {
+    engine.camPos.x = position.x;
+    engine.camPos.y = position.y;
+}
+
+void s2d_camera_move(f32 dx, f32 dy) {
+    engine.camPos.x += dx;
+    engine.camPos.y += dy;
+}
+
+void s2d_camera_zoom(f32 dz) {
+    engine.camZoom += dz;
+    if (engine.camZoom > S2D_MAX_ZOOM) {
+        engine.camZoom = S2D_MAX_ZOOM;
+    } else if (engine.camZoom < S2D_MIN_ZOOM) {
+        engine.camZoom = S2D_MIN_ZOOM;
+    }
+}
+
+void s2d_camera_set_zoom(f32 z) {
+    engine.camZoom = z;
+}
+
+void camera_init() {
+    engine.camPos  = (clmVec3) { 0.0f, 0.0f, 1.0f };
+    engine.camZoom = S2D_CAM_INITIAL_ZOOM;
+    engine.camUp   = S2D_CAM_UP;
+}
+
+clmMat4 camera_projection() {
+    return clm_mat4_ortho(
+             -engine.camZoom * engine.aspectRatio,
+              engine.camZoom * engine.aspectRatio,
+             -engine.camZoom,
+              engine.camZoom,
+              0.1f,
+              100.0f);
+}
+
+clmMat4 camera_view() {
+    return clm_mat4_lookat(
+            engine.camPos,
+            (clmVec3) { engine.camPos.x, engine.camPos.y, -1.0f },
+            engine.camUp);
+}
+
+/*****************************************************************************/

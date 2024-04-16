@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <clm/clm.h>
+#include <settings.h>
 
 
 // Engine flags.
@@ -67,4 +68,21 @@ typedef double f64;
 typedef struct {
     clmVec2 position;
     clmVec2 texCoord;
+    clmVec4 colour;
 } Vertex;
+
+// Animation.
+
+// A Frame is a normalised rect region of a texture.
+typedef struct {
+    f32 x;
+    f32 y;
+    f32 w;
+    f32 h;
+} Frame;
+
+// An Animation is a sequence of Frames which index into an array
+typedef struct {
+    Frame frames[S2D_MAX_ANIMATION_FRAMES];
+    u32   frameCount;
+} Animation;
