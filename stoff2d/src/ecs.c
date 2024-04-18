@@ -1,17 +1,8 @@
-#include <ecs.h>
-#include <component_map.h>
+#include <stoff2d.h>
 #include <cds/cds_exlist.h>
-#include <sprite_renderer.h>
 
 #include <string.h>
 #include <stdio.h>
-
-typedef struct {
-    f32 x;
-    f32 y;
-    f32 w;
-    f32 h;
-} Rect;
 
 // Component buckets. Array of hash maps mapping <eID, Component>
 ComponentMap componentBuckets[CMP_TYPE_COUNT];
@@ -31,9 +22,7 @@ u32        nextID = 1;
 const char* componentStrings[CMP_TYPE_COUNT] = {
     "PositionComponent",
     "SpriteComponent",
-    "VelocityComponent",
-    "BoxColliderComponent",
-    "ControlComponent",
+    "VelocityComponent"
 };
 
 /******************************** ADD/REMOVE *********************************/
@@ -143,4 +132,3 @@ void ecs_shutdown() {
         component_map_destroy(&componentBuckets[i]);
     }
 }
-

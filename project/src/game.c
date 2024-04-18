@@ -1,8 +1,4 @@
-#include <game.h>
-
 #include <stoff2d.h>
-#include <ecs.h>
-
 #include <system.h>
 
 #include <stdlib.h>
@@ -16,31 +12,49 @@ typedef struct {
     ParticleData waterParticles;
     ParticleData partyParticles;
     ParticleData smokeParticles;
+    f32 camSpeed;
+    f32 camZoom;
 } GameData;
 
 GameData gData;
 
 void game_update(f32 timeStep) {
-    f32 camSpeed = 500.0f;
-    f32 camZoom = 300.0f;
+    // Quit.
+    if (s2d_keydown(S2D_KEY_Q)) {
+        gData.running = false;
+    }
+
+    // Zoom.
     if (s2d_keydown(S2D_KEY_O)) {
-        s2d_camera_zoom(camZoom * timeStep);
+        s2d_camera_zoom(gData.camZoom * timeStep);
     }
     if (s2d_keydown(S2D_KEY_I)) {
-        s2d_camera_zoom(-camZoom * timeStep);
+        s2d_camera_zoom(-gData.camZoom * timeStep);
     }
+
+    // Toggle fullscreen/windowed.
+    if (s2d_keydown(S2D_KEY_F)) {
+        s2d_window_fullscreen();
+    }
+    if (s2d_keydown(S2D_KEY_V)) {
+        s2d_window_windowed();
+    }
+
+    // Move camera.
     if (s2d_keydown(S2D_KEY_W)) {
-        s2d_camera_move(0, camSpeed * timeStep);
+        s2d_camera_move(0, gData.camSpeed * timeStep);
     }
     if (s2d_keydown(S2D_KEY_A)) {
-        s2d_camera_move(-camSpeed * timeStep, 0);
+        s2d_camera_move(-gData.camSpeed * timeStep, 0);
     }
     if (s2d_keydown(S2D_KEY_S)) {
-        s2d_camera_move(0, -camSpeed * timeStep);
+        s2d_camera_move(0, -gData.camSpeed * timeStep);
     }
     if (s2d_keydown(S2D_KEY_D)) {
-        s2d_camera_move(camSpeed * timeStep, 0);
+        s2d_camera_move(gData.camSpeed * timeStep, 0);
     }
+
+    // Spawn particles.
     if (s2d_keydown(S2D_KEY_P)) {
         gData.fireParticles.position = s2d_mouse_world_pos();
         s2d_particles_add(&gData.fireParticles);
@@ -61,6 +75,8 @@ void game_update(f32 timeStep) {
         gData.smokeParticles.position = s2d_mouse_world_pos();
         s2d_particles_add(&gData.smokeParticles);
     }
+
+    // Systems.
     system_move(timeStep);
     system_render();
 }
@@ -92,6 +108,7 @@ void test_entity(f32 x, f32 y, f32 vx, f32 vy) {
             .layer = 0
         }
     };
+
     s2d_ecs_add_component(position);
     s2d_ecs_add_component(velocity);
     s2d_ecs_add_component(sprite);
@@ -104,7 +121,9 @@ void game_init() {
     }
     s2d_set_flags(S2D_LOG_STATS);
 
-    gData.mcTex = s2d_load_texture("mc_sprites.png");
+    gData.mcTex    = s2d_load_texture("font.png");
+    gData.camZoom  = 500.0f;
+    gData.camSpeed = 300.0f;
 
     int n = 100;
     for (int i = 0; i < n; i++) {
@@ -180,9 +199,6 @@ void game_init() {
 void game_run() {
     while (gData.running) {
         f32 timeStep = s2d_start_frame();
-        if (s2d_keydown(S2D_KEY_Q)) {
-            gData.running = false;
-        }
         game_update(timeStep);
         s2d_end_frame();
     }

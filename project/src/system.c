@@ -1,6 +1,4 @@
-#include <system.h>
-#include <ecs.h>
-#include <sprite_renderer.h>
+#include <stoff2d.h>
 
 void system_render() {
     ComponentMap* spriteCmps = s2d_ecs_get_bucket(CMP_TYPE_SPRITE);

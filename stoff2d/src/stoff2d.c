@@ -1,8 +1,6 @@
 #include <glad/glad.h>
-
 #include <stoff2d.h>
 #include <shader.h>
-
 #include <stbi/stbi_image.h>
 
 #include <stdlib.h>
@@ -51,7 +49,7 @@ typedef struct {
 
 EngineData engine;
 
-/********************************* HELPERS ***********************************/
+/*************************** Forward Declerations ****************************/
 
 // Stats logging.
 void log_stats();
@@ -71,6 +69,23 @@ clmMat4 camera_projection();
 
 // Animation.
 void animations_init();
+
+// Particle System.
+void particles_init();
+void particles_render();
+void particles_update(f32 timeStep);
+
+// ECS.
+void ecs_init();
+void ecs_shutdown();
+
+// Sprite Renderer.
+void sprite_renderer_init();
+void sprite_renderer_shutdown();
+
+// Component Map.
+void component_map_init(ComponentMap* map);
+void component_map_destroy(ComponentMap* map);
 
 /*****************************************************************************/
 

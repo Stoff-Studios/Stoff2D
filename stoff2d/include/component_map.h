@@ -1,6 +1,6 @@
 #pragma once
 
-#include <component.h>
+#include <defines.h>
 
 typedef struct {
     Component component;
@@ -56,18 +56,3 @@ void component_map_delete(ComponentMap* map, u32 eID);
  * Print the data values of the map.
  */
 void component_map_print(ComponentMap* map);
-
-/* component_map_init
- * ------------------
- * Initialise a component map.
- * NOTE: this is called by the engine in initialisation, no need to call.
- */
-void component_map_init(ComponentMap* map);
-
-/* component_map_destroy
- * ---------------------
- * Free memory used by the map.
- * NOTE: this is called by the engine in initialisation, no need to call.
- */
-void component_map_destroy(ComponentMap* map);
-

@@ -30,7 +30,7 @@
 
 
 // Particles.
-#define MAX_PARTICLES 100000
+#define MAX_PARTICLES 5000
 
 
 // Camera.

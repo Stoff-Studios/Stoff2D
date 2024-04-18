@@ -1,6 +1,5 @@
-#include <particle.h>
-
 #include <stoff2d.h>
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -20,6 +19,7 @@ typedef struct {
 Particle particles[MAX_PARTICLES];
 u64      nextIndex = 0;
 u64      aliveCount = 0;
+
 
 void particles_init() {
     srand(12345678);

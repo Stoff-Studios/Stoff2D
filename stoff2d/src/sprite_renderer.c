@@ -1,4 +1,4 @@
-#include <sprite_renderer.h>
+#include <stoff2d.h>
 #include <cds/cds_exlist.h>
 
 typedef struct {

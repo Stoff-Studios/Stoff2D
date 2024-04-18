@@ -7,12 +7,16 @@
 #include <settings.h>
 
 
-// Engine flags.
+/********************************** Flags ************************************/
+
 #define S2D_RUNNING   0x00000001
 #define S2D_LOG_STATS 0x00000002
 
+/*****************************************************************************/
 
-// Keycodes.
+
+/********************************* Keycodes **********************************/
+
 #define S2D_KEY_A GLFW_KEY_A
 #define S2D_KEY_B GLFW_KEY_B
 #define S2D_KEY_C GLFW_KEY_C
@@ -40,6 +44,10 @@
 #define S2D_KEY_Y GLFW_KEY_Y
 #define S2D_KEY_Z GLFW_KEY_Z
 
+/*****************************************************************************/
+
+
+/******************************** Base types *********************************/
 
 // Unsigned types.
 typedef uint8_t  u8;
@@ -59,9 +67,12 @@ typedef int64_t i64;
 typedef float  f32;
 typedef double f64;
 
+/*****************************************************************************/
 
-// Renderer
-#define S2D_MAX_QUADS    10000 // maximum of 10k quads per draw call.
+
+/********************************* Renderer **********************************/
+
+#define S2D_MAX_QUADS    10000 
 #define S2D_MAX_VERTICES (4 * S2D_MAX_QUADS)
 #define S2D_MAX_INDICES  (6 * S2D_MAX_QUADS)
 
@@ -71,7 +82,10 @@ typedef struct {
     clmVec4 colour;
 } Vertex;
 
-// Animation.
+/*****************************************************************************/
+
+
+/******************************** Animation **********************************/
 
 // A Frame is a normalised rect region of a texture.
 typedef struct {
@@ -86,3 +100,63 @@ typedef struct {
     Frame frames[S2D_MAX_ANIMATION_FRAMES];
     u32   frameCount;
 } Animation;
+
+/*****************************************************************************/
+
+
+/******************************** Particles **********************************/
+
+typedef struct {
+    u32     count;         // number of particles to spawn.
+    f32     lifeTime;      // lifetime of each particle in seconds.
+    clmVec2 position;
+    clmVec2 lowerVelocity; // lower velocity bound.
+    clmVec2 upperVelocity; // upper velocity bound.
+    clmVec2 lowerSize;     // lower size bound.
+    clmVec2 upperSize;     // upper size bound.
+    clmVec4 birthColour;   // start colour.
+    clmVec4 deathColour;   // end colour.
+} ParticleData;
+
+/*****************************************************************************/
+
+
+/*********************************** ECS *************************************/
+
+// 0 is reserved as error value
+#define NO_ENTITY 0 
+
+// Component types.
+typedef enum {
+    CMP_TYPE_POSITION,
+    CMP_TYPE_SPRITE,
+    CMP_TYPE_VELOCITY,
+    CMP_TYPE_COUNT
+} ComponentType;
+
+typedef struct {
+    clmVec2 position;
+} PositionComponent;
+
+typedef struct {
+    clmVec2 size;
+    u32     texture;
+    Frame   frame;
+    u8      layer;
+} SpriteComponent;
+
+typedef struct {
+    clmVec2 velocity;
+} VelocityComponent;
+
+typedef struct {
+    u32           eID;  // ID of the entity the component belongs to.
+    ComponentType type; // Type of this component.
+    union {   
+        PositionComponent    position;
+        SpriteComponent      sprite;
+        VelocityComponent    velocity;
+    };
+} Component;
+
+/*****************************************************************************/
