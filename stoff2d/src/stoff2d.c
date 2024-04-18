@@ -472,7 +472,7 @@ bool s2d_keydown(u32 key) {
 clmVec2 s2d_mouse_screen_pos() {
     double x, y;
     glfwGetCursorPos(engine.winPtr, &x, &y);
-    return (clmVec2) { x, engine.scrHeight - y };
+    return (clmVec2) { x, engine.winHeight - y };
 }
 
 clmVec2 s2d_mouse_world_pos() {
@@ -484,8 +484,8 @@ clmVec2 s2d_mouse_world_pos() {
     // Normalise the position of the mouse cursor in screen space, then multiply
     // that by the width of the screen and add that to the bottom left world space.
     return (clmVec2) {
-        .x = bottomLeft.x + (2.0f * engine.camZoom * engine.aspectRatio * (mousePos.x / ((f32) engine.scrWidth))),
-        .y = bottomLeft.y + (2.0f * engine.camZoom * (mousePos.y / ((f32) engine.scrHeight)))
+        .x = bottomLeft.x + (2.0f * engine.camZoom * engine.aspectRatio * (mousePos.x / ((f32) engine.winWidth))),
+        .y = bottomLeft.y + (2.0f * engine.camZoom * (mousePos.y / ((f32) engine.winHeight)))
     };
 }
 
