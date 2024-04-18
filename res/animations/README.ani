@@ -4,6 +4,7 @@
 # To create animations there are two steps:
 #   1. specify the sprite-sheet dimensions
 #   2. provide as many animations in curly braces to your hearts desire
+#   3. to retrieve animations after initialisation, call s2d_animations_get
 #
 # When the engine is initialised all these aniamtions will be loaded into a hash
 # map which can be queried using s2d_animations_get(char* name), alls ya gots to 
