@@ -1,9 +1,9 @@
 #pragma once
 
 // Res folders.
-#define S2D_TEXTURE_FOLDER "../res/textures/"
-#define S2D_SHADER_FOLDER  "../res/shaders/"
-#define S2D_ANIMATION_FILE "../res/animations/animations.ani"
+#define S2D_TEXTURE_FOLDER "res/textures/"
+#define S2D_SHADER_FOLDER  "res/shaders/"
+#define S2D_ANIMATION_FILE "res/animations/animations.ani"
 
 
 // Animation.
@@ -30,7 +30,7 @@
 
 
 // Particles.
-#define MAX_PARTICLES 5000
+#define MAX_PARTICLES 10000
 
 
 // Camera.

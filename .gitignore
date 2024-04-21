@@ -1,1 +1,8 @@
 bin/*
+build/*
+bin-int/*
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+.vs/*
