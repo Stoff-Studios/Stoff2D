@@ -83,9 +83,6 @@ void ecs_shutdown();
 void sprite_renderer_init();
 void sprite_renderer_shutdown();
 
-// Component Map.
-void component_map_init(ComponentMap* map);
-void component_map_destroy(ComponentMap* map);
 
 /*****************************************************************************/
 

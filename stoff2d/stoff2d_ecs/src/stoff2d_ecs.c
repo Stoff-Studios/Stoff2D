@@ -1,11 +1,61 @@
-#include <stoff2d.h>
+#include <stoff2d_ecs.h>
 #include <cds/cds_exlist.h>
 
 #include <string.h>
 #include <stdio.h>
 
+/**************************** Component Hash Map *****************************/
+
+/* component_map_init
+ * ------------------
+ * Initialise component map.
+ */
+void component_map_init(s2dComponentMap* map);
+
+/* component_map_destroy
+ * ---------------------
+ * Cleanup memory.
+ */
+void component_map_destroy(s2dComponentMap* map);
+
+/* component_map_size
+ * ------------------
+ * Retrieve the current size of the map.
+ */
+u64 component_map_size(s2dComponentMap* map);
+
+/* component_map_put
+ * -----------------
+ * Insert a component into the map.
+ */
+void component_map_put(s2dComponentMap* map, Component cmp);
+
+/* component_map_get
+ * -----------------
+ * Retrieve a reference to the component with eID. NULL if not found.
+ */
+Component* component_map_get(s2dComponentMap* map, u32 eID);
+
+
+/* component_map_delete
+ * --------------------
+ * Delete a record from the map
+ */
+void component_map_delete(s2dComponentMap* map, u32 eID);
+
+/* component_map_print
+ * --------------------
+ * Print the data values of the map.
+ */
+void component_map_print(s2dComponentMap* map);
+
+/*****************************************************************************/
+
+
+/***************************** ECS starts here *******************************/
+
 // Component buckets. Array of hash maps mapping <eID, Component>
-ComponentMap componentBuckets[CMP_TYPE_COUNT];
+s2dComponentMap componentBuckets[CMP_TYPE_COUNT];
 
 // Each ComponentType indexes to it's corresponding bitmask.
 u64 componentMasks[CMP_TYPE_COUNT];
@@ -25,7 +75,7 @@ const char* componentStrings[CMP_TYPE_COUNT] = {
     "VelocityComponent"
 };
 
-/******************************** ADD/REMOVE *********************************/
+/****************************** ADD/REMOVE ***********************************/
 
 u32 s2d_ecs_create_entity() {
     u32 eID = NO_ENTITY;
@@ -79,7 +129,7 @@ Component* s2d_ecs_get_component(u32 eID, ComponentType type) {
     return (Component*) component_map_get(&componentBuckets[type], eID);
 }
 
-ComponentMap* s2d_ecs_get_bucket(ComponentType type) {
+s2dComponentMap* s2d_ecs_get_bucket(ComponentType type) {
     return &componentBuckets[type];
 }
 
@@ -91,11 +141,11 @@ bool s2d_ecs_entity_has(u32 eID, ComponentType type) {
 
 void s2d_ecs_print_components() {
     for (ComponentType type = 0; type < CMP_TYPE_COUNT; type++) {
-        ComponentMap* components = &componentBuckets[type];
+        s2dComponentMap* components = &componentBuckets[type];
         printf("\nCOMPONENTS: %s (size - %llu tableSize - %llu)\n",
                 componentStrings[type], 
                 component_map_size(components),
-                component_map_tablesize(components));
+                s2d_component_map_tablesize(components));
         component_map_print(components);
         printf("END\n");
     }

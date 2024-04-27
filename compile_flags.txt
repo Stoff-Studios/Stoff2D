@@ -1,7 +1,11 @@
 -I
-stoff2d/include
+stoff2d/stoff2d_core/include
 -I
-stoff2d/src
+stoff2d/stoff2d_core/src
+-I
+stoff2d/stoff2d_ecs/include
+-I
+stoff2d/stoff2d_ecs/src
 -I
 stoff2d/vendor/include
 -I

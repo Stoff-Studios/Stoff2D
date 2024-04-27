@@ -1,4 +1,4 @@
-#include <component_map.h>
+#include <stoff2d_ecs.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -17,21 +17,21 @@ u32 hash_eid(u32 eID) {
     return eID; 
 }
 
-void component_map_clear(Entry* data, u64 tableSize) {
+void component_map_clear(s2dComponentEntry* data, u64 tableSize) {
     for (u64 i = 0; i < tableSize; i++) {
-        Entry* e = &data[i];
+        s2dComponentEntry* e = &data[i];
         e->active = false;
         e->tombStoned = false;
         memset(&e->component, 0, sizeof(Component));
     }
 }
 
-void resize(ComponentMap* map) {
+void resize(s2dComponentMap* map) {
     u64 newTableSize = map->tableSize * 2;
-    Entry* newData = malloc(sizeof(Entry) * newTableSize);
+    s2dComponentEntry* newData = malloc(sizeof(s2dComponentEntry) * newTableSize);
     component_map_clear(newData, newTableSize);
     for (u64 i = 0; i < map->tableSize; i++) {
-        Entry entry = map->data[i];
+        s2dComponentEntry entry = map->data[i];
         if (!entry.active) {
             continue;
         }
@@ -39,7 +39,7 @@ void resize(ComponentMap* map) {
         Component c = entry.component;
         u64 hash = hash_eid(c.eID);
         u64 newIndex = hash % newTableSize;
-        Entry newEntry = (Entry) {
+        s2dComponentEntry news2dComponentEntry = (s2dComponentEntry) {
             .component = c,
             .active = true,
             .tombStoned = false
@@ -51,33 +51,33 @@ void resize(ComponentMap* map) {
                 newIndex = 0;
             }
         }
-        newData[newIndex] = newEntry;
+        newData[newIndex] = news2dComponentEntry;
     }
     free(map->data);
     map->data = newData;
     map->tableSize = newTableSize;
 } 
 
-void component_map_init(ComponentMap* map) {
+void component_map_init(s2dComponentMap* map) {
     map->size = 0;
     map->tableSize = INIT_TABLE_SIZE;
-    map->data = malloc(sizeof(Entry) * INIT_TABLE_SIZE);
+    map->data = malloc(sizeof(s2dComponentEntry) * INIT_TABLE_SIZE);
     component_map_clear(map->data, INIT_TABLE_SIZE);
 }
 
-u64 component_map_size(ComponentMap* map) {
+u64 component_map_size(s2dComponentMap* map) {
     return map->size;
 }
 
-u64 component_map_tablesize(ComponentMap* map) {
+u64 s2d_component_map_tablesize(s2dComponentMap* map) {
     return map->tableSize;
 }
 
-void component_map_put(ComponentMap* map, Component cmp) {
+void component_map_put(s2dComponentMap* map, Component cmp) {
     if (((f32) map->size / (f32) map->tableSize) > MAX_LOAD_FACTOR) {
         resize(map);
     }
-    Entry entry = (Entry) {
+    s2dComponentEntry entry = (s2dComponentEntry) {
         .component = cmp,
         .active = true,
         .tombStoned = false
@@ -109,7 +109,7 @@ void component_map_put(ComponentMap* map, Component cmp) {
     map->size++;
 }
 
-Component* component_map_get(ComponentMap* map, u32 eID) {
+Component* component_map_get(s2dComponentMap* map, u32 eID) {
     u64 startIndex = hash_eid(eID) % map->tableSize;
     for (u64 i = 0; i < map->tableSize; i++) {
         u64 nextIndex = (startIndex + i) % map->tableSize;
@@ -120,14 +120,14 @@ Component* component_map_get(ComponentMap* map, u32 eID) {
     return NULL;
 }
 
-Component* component_map_at(ComponentMap* map, u64 index) {
+Component* s2d_component_map_at(s2dComponentMap* map, u64 index) {
     if (index < 0 || index >= map->tableSize) {
         return NULL;
     }
     return &map->data[index].component;
 }
 
-void component_map_delete(ComponentMap* map, u32 eID) {
+void component_map_delete(s2dComponentMap* map, u32 eID) {
     u64 startIndex = hash_eid(eID) % map->tableSize;
     for (u64 i = 0; i < map->tableSize; i++) {
         u64 nextIndex = (startIndex + i) % map->tableSize;
@@ -141,11 +141,11 @@ void component_map_delete(ComponentMap* map, u32 eID) {
     }
 }
 
-void component_map_destroy(ComponentMap* map) {
+void component_map_destroy(s2dComponentMap* map) {
     free(map->data);
 }
 
-void component_map_print(ComponentMap* map) {
+void component_map_print(s2dComponentMap* map) {
     for (u64 i = 0; i < map->tableSize; i++) {
         printf("eID: %u | active: %u | tombStoned: %u\n", 
                 map->data[i].component.eID,

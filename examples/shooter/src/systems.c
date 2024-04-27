@@ -1,27 +1,35 @@
 #include <stoff2d.h>
+#include <stoff2d_ecs.h>
 #include <entities.h>
 #include <particle_types.h>
 
 void system_render() {
-    ComponentMap* spriteCmps = s2d_ecs_get_bucket(CMP_TYPE_SPRITE);
-    for (u64 i = 0; i < component_map_tablesize(spriteCmps); i++) {
-        Component* spriteCmp = component_map_at(spriteCmps, i);
+    s2dComponentMap* spriteCmps = s2d_ecs_get_bucket(CMP_TYPE_SPRITE);
+    for (u64 i = 0; i < s2d_component_map_tablesize(spriteCmps); i++) {
+        Component* spriteCmp = s2d_component_map_at(spriteCmps, i);
         u32 eID = spriteCmp->eID;
         if (eID == NO_ENTITY || !s2d_ecs_entity_has(eID, CMP_TYPE_POSITION)) {
             continue;
         }
         Component* posCmp = s2d_ecs_get_component(eID, CMP_TYPE_POSITION);
         s2d_sprite_renderer_add_sprite(
-                spriteCmp->sprite, 
-                posCmp->position.position);
+                (s2dSprite) { 
+                    .position = posCmp->position.position,
+                    .size = spriteCmp->sprite.size,
+                    .colour = spriteCmp->sprite.colour,
+                    .texture = spriteCmp->sprite.texture,
+                    .frame = spriteCmp->sprite.frame,
+                    .layer = spriteCmp->sprite.layer
+                    }
+                );
     }
     s2d_sprite_renderer_render_sprites();
 }
 
 void system_move(f32 timeStep) {
-    ComponentMap* velCmps = s2d_ecs_get_bucket(CMP_TYPE_VELOCITY);
-    for (u64 i = 0; i < component_map_tablesize(velCmps); i++) {
-        Component* velCmp = component_map_at(velCmps, i);
+    s2dComponentMap* velCmps = s2d_ecs_get_bucket(CMP_TYPE_VELOCITY);
+    for (u64 i = 0; i < s2d_component_map_tablesize(velCmps); i++) {
+        Component* velCmp = s2d_component_map_at(velCmps, i);
         u32 eID = velCmp->eID;
         if (eID == NO_ENTITY || !s2d_ecs_entity_has(eID, CMP_TYPE_POSITION)) {
             continue;
@@ -33,9 +41,9 @@ void system_move(f32 timeStep) {
 }
 
 void system_control(f32 timeStep) {
-    ComponentMap* playerCmps = s2d_ecs_get_bucket(CMP_TYPE_PLAYER);
-    for (u64 i = 0; i < component_map_tablesize(playerCmps); i++) {
-        Component* controlCmp = component_map_at(playerCmps, i);
+    s2dComponentMap* playerCmps = s2d_ecs_get_bucket(CMP_TYPE_PLAYER);
+    for (u64 i = 0; i < s2d_component_map_tablesize(playerCmps); i++) {
+        Component* controlCmp = s2d_component_map_at(playerCmps, i);
         u32 eID = controlCmp->eID;
         if (eID == NO_ENTITY || !s2d_ecs_entity_has(eID, CMP_TYPE_VELOCITY)) {
             continue;
@@ -96,9 +104,9 @@ void system_control(f32 timeStep) {
 }
 
 void system_death_timer(f32 timeStep) {
-    ComponentMap* timers = s2d_ecs_get_bucket(CMP_TYPE_DEATH_TIMER);
-    for (u64 i = 0; i < component_map_tablesize(timers); i++) {
-        Component* timer = component_map_at(timers, i);
+    s2dComponentMap* timers = s2d_ecs_get_bucket(CMP_TYPE_DEATH_TIMER);
+    for (u64 i = 0; i < s2d_component_map_tablesize(timers); i++) {
+        Component* timer = s2d_component_map_at(timers, i);
         u32 eID = timer->eID;
         if (eID == NO_ENTITY) {
             continue;
@@ -111,9 +119,9 @@ void system_death_timer(f32 timeStep) {
 }
 
 void system_particles(f32 timeStep) {
-    ComponentMap* emitters = s2d_ecs_get_bucket(CMP_TYPE_PARTICLE_EMITTER);
-    for (u64 i = 0; i < component_map_tablesize(emitters); i++) {
-        Component* emitter = component_map_at(emitters, i);
+    s2dComponentMap* emitters = s2d_ecs_get_bucket(CMP_TYPE_PARTICLE_EMITTER);
+    for (u64 i = 0; i < s2d_component_map_tablesize(emitters); i++) {
+        Component* emitter = s2d_component_map_at(emitters, i);
         emitter->particleEmitter.timeUntillNextEmit -= timeStep;
         if (emitter->particleEmitter.timeUntillNextEmit <= 0.0f) {
             emitter->particleEmitter.timeUntillNextEmit = 

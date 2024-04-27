@@ -1,23 +1,44 @@
 # Stoff2D
-2D game engine in C.
+Stoff2D is a game engine/library written in C for windows. It is intended to be
+built as a static library.
 
-### Some important things
-- Checkout settings.h for control over some internals.
+## Features and Usage
+Stoff2D is a modular collection of libraries. Each submodule is standalone and does
+not depend on the others.
 
-- Checkout README.ani to learn how to load animations with ease.
+Visit each s2d_X header to see what is available, and checkout the example projects
+in examples to see how stoff2d can be used to create a game.
 
-- The renderer uses a blank texture "white.png" for rendering coloured quads, so
-  don't delete it.
+To control lower level details like max entites/particles or even quads per draw
+call, have a look at stoff2d/stoff2d_core/settings.h, here you can also set the 
+resource folder locations.
 
-- The font texture can be removed it's just an example.
+stoff2d_ecs is designed to be extended. To add your own components simply edit 
+components.h and recompile. For this reason I recommend including the source code 
+for stoff2d_ecs as apart of your project (it is quite small).
 
-- To add components to the ECS, go into defines.h and add them there under the 
-  ECS section.
-    - Create a new component struct 
-    - Add an enum for it in "ComponentTypes" 
-    - Add the struct to the union in "Component" 
-  and you're done! You can now use s2d_ecs functions to use your new component.
+stoff2d_core:
+    - windowing and input
+    - 2D quad renderer (coloured/textured)
+    - sprite layering
+    - particle system
+    - animations (see README.ani)
 
-- If you want the debug function s2d_ecs_print_components() to print component 
-  names correctly, add the new component name to the array of names "componontStrings"
-  at the top of ecs.c  
+stoff2d_ecs:
+    - entity component system
+
+## Build
+Stoff2D uses premake to generate a visual studio solution. To build stoff2d,
+clone the repository and run the setup.bat script. 
+```batch
+> git clone https://github.com/Stoff-Studios/Stoff2D
+> cd Stoff2D
+> .\setup.bat
+```
+In the root directory, stoff2d.sln will be generated. Open this to build stoff2d
+and the example projects.
+
+To delete all build files and binaries (return to original state after clone)
+```batch
+> .\setup.bat clean
+```

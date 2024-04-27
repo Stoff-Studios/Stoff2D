@@ -1,4 +1,5 @@
 #include <stoff2d.h>
+#include <stoff2d_ecs.h>
 #include <entities.h>
 #include <particle_types.h>
 
