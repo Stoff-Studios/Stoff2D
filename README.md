@@ -18,14 +18,14 @@ components.h and recompile. For this reason I recommend including the source cod
 for stoff2d_ecs as apart of your project (it is quite small).
 
 stoff2d_core:
-    - windowing and input
-    - 2D quad renderer (coloured/textured)
-    - sprite layering
-    - particle system
-    - animations (see README.ani)
+- windowing and input
+- 2D quad renderer (coloured/textured)
+- sprite layering
+- particle system
+- animations (see README.ani)
 
 stoff2d_ecs:
-    - entity component system
+- entity component system
 
 ## Build
 Stoff2D uses premake to generate a visual studio solution. To build stoff2d,
