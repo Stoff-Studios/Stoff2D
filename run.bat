@@ -5,9 +5,9 @@ IF "%~1"=="release" GOTO release
 IF "%~1"=="" GOTO debug
 
 :release
-bin\Release\TestProject.exe
+bin\Release\Shooter.exe
 EXIT
 
 :debug
-bin\Debug\TestProject.exe
+bin\Debug\Shooter.exe
 EXIT

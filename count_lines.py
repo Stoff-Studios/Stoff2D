@@ -53,7 +53,7 @@ def count_dir(dir):
     return code, comments, blanks
 
 # list of directories (relative to root) to check
-directories = ["stoff2d/src", "stoff2d/include", "project/src"]
+directories = ["stoff2d/src", "stoff2d/include", "examples/shooter/src"]
 
 code = 0
 comments = 0

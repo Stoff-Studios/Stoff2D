@@ -44,6 +44,11 @@
 #define S2D_KEY_Y GLFW_KEY_Y
 #define S2D_KEY_Z GLFW_KEY_Z
 
+#define S2D_KEY_LEFT  GLFW_KEY_LEFT
+#define S2D_KEY_RIGHT GLFW_KEY_RIGHT
+#define S2D_KEY_UP    GLFW_KEY_UP
+#define S2D_KEY_DOWN  GLFW_KEY_DOWN
+
 /*****************************************************************************/
 
 
@@ -71,6 +76,8 @@ typedef double f64;
 
 
 /********************************* Renderer **********************************/
+
+#define S2D_COLOURED_QUAD_TEXTURE 0x8080
 
 #define S2D_MAX_QUADS    10000 
 #define S2D_MAX_VERTICES (4 * S2D_MAX_QUADS)
@@ -131,6 +138,9 @@ typedef enum {
     CMP_TYPE_POSITION,
     CMP_TYPE_SPRITE,
     CMP_TYPE_VELOCITY,
+    CMP_TYPE_PLAYER,
+    CMP_TYPE_DEATH_TIMER,
+    CMP_TYPE_PARTICLE_EMITTER,
     CMP_TYPE_COUNT
 } ComponentType;
 
@@ -140,6 +150,7 @@ typedef struct {
 
 typedef struct {
     clmVec2 size;
+    clmVec4 colour;
     u32     texture;
     Frame   frame;
     u8      layer;
@@ -147,15 +158,33 @@ typedef struct {
 
 typedef struct {
     clmVec2 velocity;
+    clmVec2 maxSpeed;
 } VelocityComponent;
+
+typedef struct {
+    u8 TODO;
+} PlayerComponent;
+
+typedef struct {
+    f32 timeLeft;
+} DeathTimerComponent;
+
+typedef struct {
+    u32 particleType;
+    f32 timeUntillNextEmit;
+    f32 emitWaitTime;
+} ParticleEmitterComponent;
 
 typedef struct {
     u32           eID;  // ID of the entity the component belongs to.
     ComponentType type; // Type of this component.
     union {   
-        PositionComponent    position;
-        SpriteComponent      sprite;
-        VelocityComponent    velocity;
+        PositionComponent        position;
+        SpriteComponent          sprite;
+        VelocityComponent        velocity;
+        PlayerComponent          player;
+        DeathTimerComponent      deathTimer;
+        ParticleEmitterComponent particleEmitter;
     };
 } Component;
 

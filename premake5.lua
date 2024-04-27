@@ -23,17 +23,17 @@ project "stoff2d"
       defines { "NDEBUG" }
       optimize "On"
 
-project "TestProject"
+project "Shooter"
    kind "ConsoleApp"
    language "C"
    targetdir "bin/%{cfg.buildcfg}"
    objdir "bin-int"
-   includedirs { "stoff2d/include", "stoff2d/vendor/include", "project/include" }
+   includedirs { "stoff2d/include", "stoff2d/vendor/include", "examples/shooter/include" }
    links { "stoff2d" }
    filter { "system:windows" }
        links { "user32", "gdi32" }
 
-   files { "project/**.c", "project/**.h" }
+   files { "examples/shooter/**.c", "examples/shooter/**.h" }
 
    filter "configurations:Debug"
       defines { "DEBUG" }
