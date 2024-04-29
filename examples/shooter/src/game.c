@@ -1,3 +1,4 @@
+#include <game.h>
 #include <stoff2d.h>
 #include <systems.h>
 #include <entities.h>
@@ -6,15 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-typedef struct {
-    bool running;
-    u32  texFont;
-    f32  camSpeed;
-    f32  camZoom;
-    u32  playerEID;
-} GameData;
-
-static GameData gData;
+GameData gData;
 
 void game_update(f32 timeStep) {
     // Quit.
@@ -38,10 +31,21 @@ void game_update(f32 timeStep) {
         s2d_window_windowed();
     }
 
-    // Systems.
+    // Toggle Hitboxes.
+    if (s2d_keydown(S2D_KEY_H)) {
+        gData.renderHitboxes = true;
+    } else {
+        gData.renderHitboxes = false;
+    }
+
     system_control();
+    system_spawn_enemies(timeStep);
+    system_enemy(timeStep);
     system_move(timeStep);
+    system_move_hitboxes();
     system_death_timer(timeStep);
+    system_invinsibility(timeStep);
+    system_damage();
     system_particles(timeStep);
     system_render();
 }
@@ -53,11 +57,18 @@ void game_init() {
     }
     s2d_set_flags(S2D_LOG_STATS);
     particle_types_init();
-    gData.texFont  = s2d_load_texture("font.png");
+    gData.texFont   = s2d_load_texture("font.png");
+    gData.texHitBox = s2d_load_texture("hitbox.png");
     gData.camZoom  = 500.0f;
     gData.camSpeed = 300.0f;
     gData.playerEID = create_player((clmVec2) { 0.0f, 0.0f });
     gData.running = true;
+    gData.renderHitboxes = true;
+
+    entites_set_game_data_ptr(&gData);
+    systems_set_game_data_ptr(&gData);
+
+    create_enemy((clmVec2) {0, 0});
 }
 
 void game_run() {

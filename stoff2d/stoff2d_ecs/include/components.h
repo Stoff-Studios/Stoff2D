@@ -13,6 +13,10 @@ typedef enum {
     CMP_TYPE_PLAYER,
     CMP_TYPE_DEATH_TIMER,
     CMP_TYPE_PARTICLE_EMITTER,
+    CMP_TYPE_ENEMY,
+    CMP_TYPE_HEALTH,
+    CMP_TYPE_DAMAGE,
+    CMP_TYPE_HITBOX,
     CMP_TYPE_COUNT
 } ComponentType;
 
@@ -48,6 +52,29 @@ typedef struct {
 } ParticleEmitterComponent;
 
 typedef struct {
+    u32 playerEID;
+} EnemeyComponent;
+
+typedef struct {
+    f32 hp;
+    f32 maxHp;
+    f32 invinsibilityTimer;
+    f32 invinsibilityTime;
+} HealthComponent;
+
+typedef struct {
+    f32 damage;
+    f32 cooldown;
+    f32 currentCooldown;
+    bool deleteOnHit;
+} DamageComponent;
+
+typedef struct {
+    clmVec2 position;
+    clmVec2 size;
+} HitBoxComponent;
+
+typedef struct {
     u32           eID;  // ID of the entity the component belongs to.
     ComponentType type; // Type of this component.
     union {   
@@ -57,5 +84,9 @@ typedef struct {
         PlayerComponent          player;
         DeathTimerComponent      deathTimer;
         ParticleEmitterComponent particleEmitter;
+        EnemeyComponent          enemy;
+        HealthComponent          health;
+        DamageComponent          damage;
+        HitBoxComponent          hitbox;
     };
 } Component;

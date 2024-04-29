@@ -8,7 +8,7 @@ int compare_sprite(const void* sprite1, const void* sprite2) {
     s2dSprite spr1 = (*(s2dSprite*) sprite1);
     s2dSprite spr2 = (*(s2dSprite*) sprite2);
     // Reversed ordering, we want 0 to be the front layer, i.e rendered last.
-    return (spr1.layer - spr2.layer);
+    return (spr2.layer - spr1.layer);
 }
 
 void s2d_sprite_renderer_add_sprite(s2dSprite sprite) {

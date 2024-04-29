@@ -4,6 +4,8 @@
 
 typedef enum {
     PARTICLE_TYPE_BULLET,
+    PARTICLE_TYPE_BLOOD,
+    PARTICLE_TYPE_BIG_BLOOD,
     PARTICLE_TYPE_COUNT
 } ParticleType;
 

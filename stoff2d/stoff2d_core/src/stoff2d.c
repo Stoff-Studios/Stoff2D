@@ -146,7 +146,7 @@ bool s2d_initialise_engine(const char* programName) {
     }
 
     glViewport(0, 0, engine.winWidth, engine.winHeight);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -188,7 +188,7 @@ f32 s2d_start_frame() {
     engine.drawCalls = 0;
 
     // Clear screen and poll events.
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     glfwPollEvents();
 
     // Update internal state.

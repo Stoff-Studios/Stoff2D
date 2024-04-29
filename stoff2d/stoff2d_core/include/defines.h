@@ -17,6 +17,7 @@
 
 /********************************* Keycodes **********************************/
 
+// A-Z
 #define S2D_KEY_A GLFW_KEY_A
 #define S2D_KEY_B GLFW_KEY_B
 #define S2D_KEY_C GLFW_KEY_C
@@ -43,7 +44,7 @@
 #define S2D_KEY_X GLFW_KEY_X
 #define S2D_KEY_Y GLFW_KEY_Y
 #define S2D_KEY_Z GLFW_KEY_Z
-
+// Arrow Keys
 #define S2D_KEY_LEFT  GLFW_KEY_LEFT
 #define S2D_KEY_RIGHT GLFW_KEY_RIGHT
 #define S2D_KEY_UP    GLFW_KEY_UP
