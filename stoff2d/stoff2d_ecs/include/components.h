@@ -17,6 +17,7 @@ typedef enum {
     CMP_TYPE_HEALTH,
     CMP_TYPE_DAMAGE,
     CMP_TYPE_HITBOX,
+    CMP_TYPE_ANIMATION,
     CMP_TYPE_COUNT
 } ComponentType;
 
@@ -75,6 +76,12 @@ typedef struct {
 } HitBoxComponent;
 
 typedef struct {
+    Animation* animation;
+    f32        aniIndex;
+    f32        aniSpeed;
+} AnimationComponent;
+
+typedef struct {
     u32           eID;  // ID of the entity the component belongs to.
     ComponentType type; // Type of this component.
     union {   
@@ -88,5 +95,6 @@ typedef struct {
         HealthComponent          health;
         DamageComponent          damage;
         HitBoxComponent          hitbox;
+        AnimationComponent       animation;
     };
 } Component;

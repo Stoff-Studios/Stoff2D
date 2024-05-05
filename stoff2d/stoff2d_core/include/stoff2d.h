@@ -31,10 +31,27 @@ void s2d_shutdown_engine();
 
 /* s2d_render_quad
  * ---------------
- * Render a textured quad.
+ * Render a textured quad. 
  * For optimal performance, group render calls by texture.
  *
- * To render an entire texture, frame = { 0, 0, 1, 1 }
+ * position:
+ *     bottom-left position of the quad.
+ * 
+ * size:
+ *     width and height (in pixels) of the quad.
+ * 
+ * colour:
+ *     rgba colour of the quad.
+ * 
+ * texture:
+ *     id handle to a texture (obtained by calling s2d_load_texture).
+ *     Use S2D_COLOURED_QUAD_TEXTURE if you want to render a coloured quad with
+ *     no texture. Although it is better to use s2d_render_coloured_quad in this 
+ *     case.
+ * 
+ * Frame:
+ *     normalised region of the texture to render. Frame = { 0, 0, 1, 1 } is
+ *     the entire texture.
  */
 void s2d_render_quad(
         clmVec2 position,
@@ -46,6 +63,15 @@ void s2d_render_quad(
 /* s2d_render_coloured_quad
  * ------------------------
  * Render a coloured quad.
+ *
+ * position:
+ *     bottom-left position of the quad.
+ * 
+ * size:
+ *     width and height (in pixels) of the quad.
+ * 
+ * colour:
+ *     rgba colour of the quad.
  */
 void s2d_render_coloured_quad(
         clmVec2 position,
@@ -54,10 +80,21 @@ void s2d_render_coloured_quad(
 
 /* s2d_load_texture
  * ----------------
- * Returns a texture that can be used in s2d_render_quad. 
- * Textures must be png's located in S2D_TEXTURE_FOLDER.
+ * Load a texture.
+ *
+ * fileName:
+ *     The name of a png image located in S2D_TEXTURE_FOLDER.
+ * 
+ * Returns:
+ *     texture ID that can be used in s2d_render_quad. 
  */
 u32 s2d_load_texture(const char* fileName);
+
+/* s2d_clear_colour
+ * ----------------
+ * Set the clear colour.
+ */
+void s2d_clear_colour(clmVec4 colour);
 
 /*****************************************************************************/
 

@@ -47,6 +47,7 @@ void game_update(f32 timeStep) {
     system_invinsibility(timeStep);
     system_damage();
     system_particles(timeStep);
+    system_animation(timeStep);
     system_render();
 }
 
@@ -56,18 +57,22 @@ void game_init() {
         exit(1);
     }
     s2d_set_flags(S2D_LOG_STATS);
-    particle_types_init();
-    gData.texFont   = s2d_load_texture("font.png");
-    gData.texHitBox = s2d_load_texture("hitbox.png");
-    gData.camZoom  = 500.0f;
-    gData.camSpeed = 300.0f;
-    gData.playerEID = create_player((clmVec2) { 0.0f, 0.0f });
-    gData.running = true;
-    gData.renderHitboxes = true;
+    s2d_clear_colour(CLEAR_COLOUR);
 
     entites_set_game_data_ptr(&gData);
     systems_set_game_data_ptr(&gData);
+    particle_types_init();
 
+    gData.texHitBox       = s2d_load_texture("hitbox.png");
+    gData.texSkeletonWalk = s2d_load_texture("skeleton_walk.png");
+    gData.texPlayerIdle   = s2d_load_texture("player_idle.png");
+    gData.camZoom  = 500.0f;
+    gData.camSpeed = 300.0f;
+    gData.running = true;
+    gData.renderHitboxes = true;
+
+
+    gData.playerEID = create_player((clmVec2) { 0.0f, 0.0f });
     create_enemy((clmVec2) {0, 0});
 }
 

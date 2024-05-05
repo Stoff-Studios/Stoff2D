@@ -2,17 +2,24 @@
 
 #include <game.h>
 
+// Misc
+#define CLEAR_COLOUR ((clmVec4) { 0.6f, 0.6f, 0.65f, 1.0f })
+
+
 // Player
-#define PLAYER_SPEED 200.0f
-#define PLAYER_SIZE  16.0f
+#define PLAYER_SIZE  ((clmVec2) { 32, 48 })
+#define PLAYER_SPEED 100.0f
+#define PLAYER_HP 50.0f
+#define PLAYER_INVINSIBILITY_TIME 0.5f
 
 // Bullet
-#define BULLET_SPEED 600.0f
+#define BULLET_SPEED 250.0f
 
 // Enemy
-#define ENEMY_SPEED              50.0f
-#define ENEMY_HP                 50.0f
-#define ENEMY_INVINSIBILITY_TIME 0.2f
+#define ENEMY_SIZE               ((clmVec2) { 22, 33 })
+#define ENEMY_SPEED              40.0f
+#define ENEMY_HP                 40.0f
+#define ENEMY_INVINSIBILITY_TIME 0.1f
 
 // Layers
 #define HITBOX_LAYER 0

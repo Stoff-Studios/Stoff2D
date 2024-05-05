@@ -460,6 +460,10 @@ u32 s2d_load_texture(const char* fileName) {
     return texture;
 }
 
+void s2d_clear_colour(clmVec4 colour) {
+    glClearColor(colour.r, colour.g, colour.b, colour.a);
+}
+
 /********************************* Window ************************************/
 
 bool s2d_keydown(u32 key) {

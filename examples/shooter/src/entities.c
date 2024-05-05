@@ -33,11 +33,21 @@ u32 create_player(clmVec2 pos) {
         .eID = eID,
         .type = CMP_TYPE_SPRITE,
         .sprite = (SpriteComponent) {
-            .size = (clmVec2) { PLAYER_SIZE, PLAYER_SIZE },
-            .colour = (clmVec4) { 0.2f, 0.8f, 0.2f, 1.0f },
-            .texture = S2D_COLOURED_QUAD_TEXTURE,
+            .size = PLAYER_SIZE,
+            .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
+            .texture = gData->texPlayerIdle,
             .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
             .layer = PLAYER_LAYER
+        }
+    };
+
+    Component animationCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_ANIMATION,
+        .animation = (AnimationComponent) {
+            .animation = s2d_animations_get("playerIdle"),
+            .aniIndex = 0.0f,
+            .aniSpeed = 6.0f
         }
     };
 
@@ -54,7 +64,18 @@ u32 create_player(clmVec2 pos) {
         .type = CMP_TYPE_HITBOX,
         .hitbox = (HitBoxComponent) {
             .position = (clmVec2) { 0.0f, 0.0f },
-            .size = (clmVec2) { PLAYER_SIZE, PLAYER_SIZE }
+            .size = PLAYER_SIZE
+        }
+    };
+
+    Component healthCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_HEALTH,
+        .health = (HealthComponent) {
+            .hp = PLAYER_HP,
+            .maxHp = PLAYER_HP,
+            .invinsibilityTime = PLAYER_INVINSIBILITY_TIME,
+            .invinsibilityTimer = 0.0f
         }
     };
  
@@ -63,6 +84,8 @@ u32 create_player(clmVec2 pos) {
     s2d_ecs_add_component(spriteCmp);
     s2d_ecs_add_component(playerCmp);
     s2d_ecs_add_component(hitboxCmp);
+    s2d_ecs_add_component(animationCmp);
+    //s2d_ecs_add_component(healthCmp);
 
     return eID;
 }
@@ -87,23 +110,11 @@ void create_bullet(clmVec2 position, clmVec2 velocity) {
         }
     };
 
-    Component spriteCmp = (Component) {
-        .eID = eID,
-        .type = CMP_TYPE_SPRITE,
-        .sprite = (SpriteComponent) {
-            .size = (clmVec2) { 4.0f, 4.0f },
-            .colour = (clmVec4) { 0.8f, 0.1f, 0.1f, 1.0f },
-            .texture = S2D_COLOURED_QUAD_TEXTURE,
-            .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
-            .layer = PLAYER_LAYER
-        }
-    };
-
     Component deathTimerCmp = (Component) {
         .eID = eID,
         .type = CMP_TYPE_DEATH_TIMER,
         .deathTimer = (DeathTimerComponent) {
-            .timeLeft = 5.0f
+            .timeLeft = 1.0f
         }
     };
 
@@ -113,7 +124,7 @@ void create_bullet(clmVec2 position, clmVec2 velocity) {
         .particleEmitter = (ParticleEmitterComponent) {
             .particleType = PARTICLE_TYPE_BULLET,
             .timeUntillNextEmit = 0.0f,
-            .emitWaitTime = 0.005f
+            .emitWaitTime = 0.008f
         }
     };
 
@@ -133,13 +144,12 @@ void create_bullet(clmVec2 position, clmVec2 velocity) {
             .damage = 10.0f,
             .cooldown = 0.1f,
             .currentCooldown = 0.0f,
-            .deleteOnHit = true
+            .deleteOnHit = false
         }
     };
 
     s2d_ecs_add_component(posCmp);
     s2d_ecs_add_component(velCmp);
-    s2d_ecs_add_component(spriteCmp);
     s2d_ecs_add_component(deathTimerCmp);
     s2d_ecs_add_component(particleEmitterCmp);
     s2d_ecs_add_component(hitboxCmp);
@@ -170,11 +180,21 @@ void create_enemy(clmVec2 position) {
         .eID = eID,
         .type = CMP_TYPE_SPRITE,
         .sprite = (SpriteComponent) {
-            .size = (clmVec2) { PLAYER_SIZE, PLAYER_SIZE },
-            .colour = (clmVec4) { 0.2f, 0.0f, 0.0f, 1.0f },
-            .texture = S2D_COLOURED_QUAD_TEXTURE,
+            .size = ENEMY_SIZE,
+            .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
+            .texture = gData->texSkeletonWalk,
             .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
             .layer = ENEMY_LAYER
+        }
+    };
+
+    Component animationCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_ANIMATION,
+        .animation = (AnimationComponent) {
+            .animation = s2d_animations_get("skeletonWalk"),
+            .aniIndex = 0.0f,
+            .aniSpeed = 6.0f
         }
     };
 
@@ -182,7 +202,7 @@ void create_enemy(clmVec2 position) {
         .eID = eID,
         .type = CMP_TYPE_ENEMY,
         .enemy = (EnemeyComponent) {
-            .playerEID = NO_ENTITY
+            .playerEID = NO_ENTITY // gets set in init.
         }
     };
 
@@ -191,7 +211,7 @@ void create_enemy(clmVec2 position) {
         .type = CMP_TYPE_HITBOX,
         .hitbox = (HitBoxComponent) {
             .position = (clmVec2) { 0.0f, 0.0f },
-            .size = (clmVec2) { PLAYER_SIZE, PLAYER_SIZE }
+            .size = ENEMY_SIZE
         }
     };
 
@@ -212,5 +232,6 @@ void create_enemy(clmVec2 position) {
     s2d_ecs_add_component(enemyCmp);
     s2d_ecs_add_component(hitboxCmp);
     s2d_ecs_add_component(healthCmp);
+    s2d_ecs_add_component(animationCmp);
 
 }

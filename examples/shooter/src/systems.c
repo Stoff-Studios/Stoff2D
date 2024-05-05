@@ -40,11 +40,24 @@ void system_render() {
             continue;
         }
         Component* posCmp = s2d_ecs_get_component(eID, CMP_TYPE_POSITION);
+        clmVec4 colour = spriteCmp->sprite.colour;
+        // visual indicator of invinsibility.
+        if (s2d_ecs_entity_has(eID, CMP_TYPE_HEALTH)) {
+            Component* hpCmp = s2d_ecs_get_component(eID, CMP_TYPE_HEALTH);
+            if (hpCmp->health.invinsibilityTimer > 0.0f) {
+                colour = (clmVec4) { 
+                    colour.r * 5.0f, 
+                    colour.g * 5.0f,
+                    colour.b * 5.0f,
+                    colour.a
+                };
+            }
+        }
         s2d_sprite_renderer_add_sprite(
                 (s2dSprite) { 
                     .position = posCmp->position.position,
                     .size = spriteCmp->sprite.size,
-                    .colour = spriteCmp->sprite.colour,
+                    .colour = colour,
                     .texture = spriteCmp->sprite.texture,
                     .frame = spriteCmp->sprite.frame,
                     .layer = spriteCmp->sprite.layer
@@ -112,13 +125,11 @@ void system_control(f32 timeStep) {
             velCmp->velocity.x += velCmp->maxSpeed.x;
         }
 
-        f32 bulletSpeed = 600.0f;
+        f32 bulletSpeed = BULLET_SPEED;
         cmp = s2d_ecs_get_component(eID, CMP_TYPE_POSITION);
         PositionComponent* posCmp = &cmp->position;
-        clmVec2 bulletPosition = (clmVec2) {
-            posCmp->position.x + 6.0f,
-            posCmp->position.y + 6.0f
-        };
+        clmVec2 bulletPosition = clm_v2_add(posCmp->position,
+                clm_v2_scalar_mul(0.5f, PLAYER_SIZE));
         clmVec2 vel = velCmp->velocity;
 
         static f32 canShoot = 0.0f;
@@ -130,22 +141,22 @@ void system_control(f32 timeStep) {
                 canShoot = shootTime;
                 create_bullet(
                         bulletPosition, 
-                        (clmVec2) { vel.x - bulletSpeed, vel.y });
+                        (clmVec2) { -bulletSpeed, vel.y });
             } else if (s2d_keydown(S2D_KEY_RIGHT)) {
                 canShoot = shootTime;
                 create_bullet(
                         bulletPosition, 
-                        (clmVec2) { vel.x + bulletSpeed, vel.y });
+                        (clmVec2) { bulletSpeed, vel.y });
             } else if (s2d_keydown(S2D_KEY_UP)) {
                 canShoot = shootTime;
                 create_bullet(
                         bulletPosition, 
-                        (clmVec2) { vel.x, vel.y + bulletSpeed });
+                        (clmVec2) { vel.x, bulletSpeed });
             } else if (s2d_keydown(S2D_KEY_DOWN)) {
                 canShoot = shootTime;
                 create_bullet(
                         bulletPosition, 
-                        (clmVec2) { vel.x, vel.y - bulletSpeed });
+                        (clmVec2) { vel.x, -bulletSpeed });
             }
         }
     }
@@ -205,8 +216,10 @@ void system_enemy(f32 timeStep) {
                 eID, CMP_TYPE_POSITION);
         Component* enemyVelCmp = s2d_ecs_get_component(
                 eID, CMP_TYPE_VELOCITY);
-        clmVec2 playerPos = playerPosCmp->position.position;
-        clmVec2 enemyPos = enemyPosCmp->position.position;
+        clmVec2 playerPos = clm_v2_add(playerPosCmp->position.position,
+                clm_v2_scalar_mul(0.5f, PLAYER_SIZE));
+        clmVec2 enemyPos = clm_v2_add(enemyPosCmp->position.position,
+                clm_v2_scalar_mul(0.5f, ENEMY_SIZE));
         if (enemyPos.x > playerPos.x) {
             enemyVelCmp->velocity.velocity.x = -ENEMY_SPEED;
         } else if (enemyPos.x < playerPos.x) {
@@ -330,5 +343,28 @@ void system_spawn_enemies(f32 timeStep) {
                 lower.x + (diff.x * randfnorm()),
                 lower.y + (diff.y * randfnorm())
                 });
+    }
+}
+
+void system_animation(f32 timeStep) {
+    s2dComponentMap* animations = s2d_ecs_get_bucket(CMP_TYPE_ANIMATION);
+    for (u64 i = 0; i < s2d_component_map_tablesize(animations); i++) {
+        Component* animationCmp = s2d_component_map_at(animations, i);
+        u32 aniEID = animationCmp->eID;
+        if (aniEID == NO_ENTITY) {
+            continue;
+        }
+        // increment all animation index.
+        animationCmp->animation.aniIndex += animationCmp->animation.aniSpeed * timeStep;
+        if (animationCmp->animation.aniIndex >= 
+                animationCmp->animation.animation->frameCount) {
+            animationCmp->animation.aniIndex = 0.0f;
+        }
+        // update the frame if it has a sprite.
+        if (s2d_ecs_entity_has(aniEID, CMP_TYPE_SPRITE)) {
+            Component* sprCmp = s2d_ecs_get_component(aniEID, CMP_TYPE_SPRITE);
+            sprCmp->sprite.frame =
+                animationCmp->animation.animation->frames[(u64) animationCmp->animation.aniIndex];
+        }
     }
 }
