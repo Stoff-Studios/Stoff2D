@@ -5,8 +5,8 @@
 typedef struct {
     bool running;
     bool renderHitboxes;
+    bool paused;
 
-    // Textures.
     u32  texFont;
     u32  texHitBox;
     u32  texSkeletonWalk;

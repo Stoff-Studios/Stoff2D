@@ -72,7 +72,6 @@ void animations_init();
 
 // Particle System.
 void particles_init();
-void particles_render();
 void particles_update(f32 timeStep);
 
 // ECS.
@@ -85,6 +84,7 @@ void sprite_renderer_shutdown();
 
 
 /*****************************************************************************/
+
 
 // Initialise engine.
 bool s2d_initialise_engine(const char* programName) {
@@ -183,6 +183,10 @@ f32 s2d_start_frame() {
     engine.timeStep = (f32) (currentTime - engine.lastTime);
     engine.lastTime = currentTime;
 
+    if (s2d_check_flags(S2D_PAUSED)) {
+        engine.timeStep = 0.0f;
+    }
+
     // Stats.
     engine.logStatsTimer += engine.timeStep;
     engine.drawCalls = 0;
@@ -218,7 +222,6 @@ f32 s2d_start_frame() {
 }
 
 void s2d_end_frame() {
-    particles_render();
     render_flush();
     glfwSwapBuffers(engine.winPtr);
 

@@ -72,7 +72,7 @@ void s2d_particles_add(ParticleData* pData) {
     }
 }
 
-void particles_render() {
+void s2d_particles_render() {
     u64 renderedCount = 0;
     for (u64 i = 0; i < MAX_PARTICLES; i++) {
         Particle p = particles[i];

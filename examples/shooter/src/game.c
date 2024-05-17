@@ -31,6 +31,14 @@ void game_update(f32 timeStep) {
         s2d_window_windowed();
     }
 
+    // Pause/Run.
+    if (s2d_keydown(S2D_KEY_P)) {
+        s2d_set_flags(S2D_PAUSED);
+    } 
+    if (s2d_keydown(S2D_KEY_R)) {
+        s2d_unset_flags(S2D_PAUSED);
+    } 
+
     // Toggle Hitboxes.
     if (s2d_keydown(S2D_KEY_H)) {
         gData.renderHitboxes = true;
@@ -46,8 +54,8 @@ void game_update(f32 timeStep) {
     system_death_timer(timeStep);
     system_invinsibility(timeStep);
     system_damage();
-    system_particles(timeStep);
     system_animation(timeStep);
+    system_particles(timeStep);
     system_render();
 }
 
@@ -70,6 +78,7 @@ void game_init() {
     gData.camSpeed = 300.0f;
     gData.running = true;
     gData.renderHitboxes = true;
+    gData.paused = false;
 
 
     gData.playerEID = create_player((clmVec2) { 0.0f, 0.0f });

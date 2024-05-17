@@ -47,13 +47,15 @@ Component* s2d_ecs_get_component(u32 eID, ComponentType type);
 
 /* s2d_ecs_get_bucket
  * ------------------
- * Retrieve the bucket for the component type.
+ * Retrieve the bucket for the component type. Each bucket is a hash map
+ * mapping eID -> Component. Also use this for iteration over components
+ * (see s2d_component_map_at)
  */
 s2dComponentMap* s2d_ecs_get_bucket(ComponentType type);
 
 /* s2d_ecs_entity_has
  * ------------------
- * Return true if the entity with eID has a component of type.
+ * Return true if the entity with eID has a component of type type.
  */
 bool s2d_ecs_entity_has(u32 eID, ComponentType type);
 
@@ -62,15 +64,27 @@ bool s2d_ecs_entity_has(u32 eID, ComponentType type);
  * Retrieve the current tablesize of the map. 
  *
  * Useful for iterating over all the components in a map as if it were an array. 
- * you will have to skip null entries which are signified by NO_ENTITY since.
- * (see s2d_component_map_at below)
+ * (see s2d_component_map_at)
  */
 u64 s2d_component_map_tablesize(s2dComponentMap* map);
 
 /* s2d_component_map_at
  * --------------------
  * Retrieve a reference to the component at index in the underlying array.
- * Null entries have an eID of NO_ENTITY.
+ * This allows the user to treat the hash map as an array and iterate over
+ * all the components of a particular type.
+ *
+ * Generally, to iterate over all components of type X,
+ *     
+ *     s2dComponentMap* components = s2d_ecs_get_bucket(CMP_TYPE_X);
+ *     for (int i = 0; i < s2d_component_map_tablesize(components); i++) {
+ *         Component* component = s2d_component_map_at(components, i);
+ *         if (component->eID == NO_ENTITY) {
+ *             continue; // skip empty slots in the map.
+ *         }
+ *         ... // go ham.
+ *     }
+ *
  */
 Component* s2d_component_map_at(s2dComponentMap* map, u64 index);
 

@@ -244,6 +244,9 @@ Animation* s2d_animations_get(char* name);
  */
 void s2d_particles_add(ParticleData* particlesData);
 
+void s2d_particles_render();
+
+
 /*****************************************************************************/
 
 

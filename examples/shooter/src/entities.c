@@ -233,5 +233,4 @@ void create_enemy(clmVec2 position) {
     s2d_ecs_add_component(hitboxCmp);
     s2d_ecs_add_component(healthCmp);
     s2d_ecs_add_component(animationCmp);
-
 }

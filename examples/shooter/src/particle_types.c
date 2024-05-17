@@ -26,8 +26,8 @@ void particle_types_init() {
         .upperVelocity = (clmVec2) { 200.0f, 200.0f },
         .lowerSize = (clmVec2) { 0.1f, 0.1f },
         .upperSize = (clmVec2) { 3.0f, 3.0f },
-        .birthColour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
-        .deathColour = (clmVec4) { 1.0f, 1.0f, 1.0f, 0.0f }
+        .birthColour = (clmVec4) { 0.3f, 0.0f, 0.0f, 1.0f },
+        .deathColour = (clmVec4) { 0.8f, 0.0f, 0.0f, 0.2f }
     };
     particleTypes[PARTICLE_TYPE_BIG_BLOOD] = (ParticleData) {
         .count = 200,

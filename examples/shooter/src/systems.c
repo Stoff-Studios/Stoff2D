@@ -85,6 +85,7 @@ void system_render() {
     }
 
     s2d_sprite_renderer_render_sprites();
+    s2d_particles_render();
 }
 
 void system_move(f32 timeStep) {

@@ -2,7 +2,16 @@
 
 #include <defines.h>
 
-// eID of 0 is reserved as an empty value.
+/* To extend the ecs and add more components to the system
+ *
+ * 1. extend ComponentType enum with the new component type.
+ * 2. create a struct for the new component
+ * 3. add the new struct to the union in Component (at the bottom of this file)
+ *
+ * Now the new component will be in the system
+ */
+
+// eID of 0 is reserved as an empty value. 
 #define NO_ENTITY 0 
 
 // Component types.
