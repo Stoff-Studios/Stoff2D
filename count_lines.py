@@ -54,12 +54,10 @@ def count_dir(dir):
 
 # list of directories (relative to root) to check
 directories = [
-        "stoff2d/stoff2d_core/src", 
-        "stoff2d/stoff2d_core/include", 
-        "stoff2d/stoff2d_ecs/src", 
-        "stoff2d/stoff2d_ecs/include", 
-        "examples/shooter/src",
-        "examples/shooter/include"
+        "stoff2d_core/src", 
+        "stoff2d_core/include", 
+        "stoff2d_ecs/src", 
+        "stoff2d_ecs/include"
         ]
 
 code = 0
