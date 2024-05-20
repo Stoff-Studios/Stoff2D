@@ -28,17 +28,20 @@ stoff2d_ecs:
 - entity component system
 
 ## Build
-Stoff2D uses premake to generate a visual studio solution. To build stoff2d,
-clone the repository and run the setup.bat script. 
-```batch
+Stoff2D uses CMake, so to build from the command line.
+```
 > git clone https://github.com/Stoff-Studios/Stoff2D
 > cd Stoff2D
-> .\setup.bat
+> mkdir build
+> cd build
+> cmake ..
+> cmake --build .
 ```
-In the root directory, stoff2d.sln will be generated. Open this to build stoff2d
-and the example projects.
+All binaries will be in path/to/build/Debug
 
-To delete all build files and binaries (return to original state after clone)
-```batch
-> .\setup.bat clean
+## Example Projects
+To run the example projects, from the root directory run
 ```
+> build/Debug/example_project
+```
+For now there is only shooter, more coming soon!
