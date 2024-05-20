@@ -23,6 +23,9 @@ target_include_directories(stoff2d_core PRIVATE
     vendor/include)
 target_link_directories(stoff2d_core PRIVATE vendor/lib)
 target_link_libraries(stoff2d_core PRIVATE glfw3)
+if (UNIX)
+    target_link_libraries(stoff2d_core PRIVATE m)
+endif (UNIX)
 
 
 
@@ -55,4 +58,7 @@ target_include_directories(shooter PRIVATE
     )
 target_link_directories(shooter PRIVATE build/Debug vendor/lib)
 target_link_libraries(shooter PRIVATE stoff2d_core stoff2d_ecs)
+if (UNIX)
+    target_link_libraries(stoff2d_ecs PRIVATE m)
+endif (UNIX)
 
