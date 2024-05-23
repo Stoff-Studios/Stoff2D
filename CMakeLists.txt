@@ -46,10 +46,6 @@ target_link_directories(stoff2d_core PRIVATE vendor/lib build build/Debug)
 
 target_link_libraries(stoff2d_core PRIVATE glfw3 clm cds)
 
-if (UNIX)
-    target_link_libraries(stoff2d_core PRIVATE m)
-endif (UNIX)
-
 #=============================================================================
 #                                stoff2d_ecs
 #=============================================================================
@@ -59,7 +55,7 @@ add_library(stoff2d_ecs STATIC
     stoff2d_ecs/stoff2d_ecs.c
     )
 
-target_include_directories(stoff2d_ecs PRIVATE include)
+target_include_directories(stoff2d_ecs PRIVATE include vendor/include)
 
 target_link_directories(stoff2d_ecs PRIVATE build/Debug build)
 
@@ -79,6 +75,6 @@ add_executable(shooter
 
 target_include_directories(shooter PRIVATE examples/shooter/include include)
 
-target_link_directories(shooter PRIVATE build/Debug build)
+target_link_directories(shooter PRIVATE build/Debug build vendor/lib)
 
 target_link_libraries(shooter PRIVATE stoff2d_core stoff2d_ecs)

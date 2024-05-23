@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <clm/clm.h>
@@ -19,37 +18,37 @@
 /********************************* Keycodes **********************************/
 
 // A-Z
-#define S2D_KEY_A GLFW_KEY_A
-#define S2D_KEY_B GLFW_KEY_B
-#define S2D_KEY_C GLFW_KEY_C
-#define S2D_KEY_D GLFW_KEY_D
-#define S2D_KEY_E GLFW_KEY_E
-#define S2D_KEY_F GLFW_KEY_F
-#define S2D_KEY_G GLFW_KEY_G
-#define S2D_KEY_H GLFW_KEY_H
-#define S2D_KEY_I GLFW_KEY_I
-#define S2D_KEY_J GLFW_KEY_J
-#define S2D_KEY_K GLFW_KEY_K
-#define S2D_KEY_L GLFW_KEY_L
-#define S2D_KEY_M GLFW_KEY_M
-#define S2D_KEY_N GLFW_KEY_N
-#define S2D_KEY_O GLFW_KEY_O
-#define S2D_KEY_P GLFW_KEY_P
-#define S2D_KEY_Q GLFW_KEY_Q
-#define S2D_KEY_R GLFW_KEY_R
-#define S2D_KEY_S GLFW_KEY_S
-#define S2D_KEY_T GLFW_KEY_T
-#define S2D_KEY_U GLFW_KEY_U
-#define S2D_KEY_V GLFW_KEY_V
-#define S2D_KEY_W GLFW_KEY_W
-#define S2D_KEY_X GLFW_KEY_X
-#define S2D_KEY_Y GLFW_KEY_Y
-#define S2D_KEY_Z GLFW_KEY_Z
+#define S2D_KEY_A 65
+#define S2D_KEY_B 66
+#define S2D_KEY_C 67
+#define S2D_KEY_D 68
+#define S2D_KEY_E 69
+#define S2D_KEY_F 70
+#define S2D_KEY_G 71
+#define S2D_KEY_H 72
+#define S2D_KEY_I 73
+#define S2D_KEY_J 74
+#define S2D_KEY_K 75
+#define S2D_KEY_L 76
+#define S2D_KEY_M 77
+#define S2D_KEY_N 78
+#define S2D_KEY_O 79
+#define S2D_KEY_P 80
+#define S2D_KEY_Q 81
+#define S2D_KEY_R 82
+#define S2D_KEY_S 83
+#define S2D_KEY_T 84
+#define S2D_KEY_U 85
+#define S2D_KEY_V 86
+#define S2D_KEY_W 87
+#define S2D_KEY_X 88
+#define S2D_KEY_Y 89
+#define S2D_KEY_Z 90
 // Arrow Keys
-#define S2D_KEY_LEFT  GLFW_KEY_LEFT
-#define S2D_KEY_RIGHT GLFW_KEY_RIGHT
-#define S2D_KEY_UP    GLFW_KEY_UP
-#define S2D_KEY_DOWN  GLFW_KEY_DOWN
+#define S2D_KEY_RIGHT 262
+#define S2D_KEY_LEFT  263
+#define S2D_KEY_DOWN  264
+#define S2D_KEY_UP    265
 
 /*****************************************************************************/
 
