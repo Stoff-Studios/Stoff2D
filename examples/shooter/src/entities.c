@@ -252,7 +252,10 @@ void create_skeleton_death_animation(clmVec2 pos) {
         .eID = eID,
         .type = CMP_TYPE_POSITION,
         .position = (PositionComponent) {
-            .position = pos
+            .position = (clmVec2) {
+                .x = pos.x - 11,
+                .y = pos.y
+            }
         }
     };
 
@@ -260,7 +263,7 @@ void create_skeleton_death_animation(clmVec2 pos) {
         .eID = eID,
         .type = CMP_TYPE_SPRITE,
         .sprite = (SpriteComponent) {
-            .size = ENEMY_SIZE,
+            .size = (clmVec2) { 33.0f, 32.0f },
             .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
             .texture = gData->texSkeletonDie,
             .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
