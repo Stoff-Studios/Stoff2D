@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25)
 project(stoff2d)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 
 
 add_library(stoff2d_core STATIC
