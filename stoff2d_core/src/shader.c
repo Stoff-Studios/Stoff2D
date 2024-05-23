@@ -64,13 +64,15 @@ unsigned int shader_create(
 
     unsigned int vShader;
     vShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vShader, 1, &vShaderSrc, NULL);
+    // fucked pointer cast fixes Werror=incompatible-pointer-types
+    glShaderSource(vShader, 1, (const GLchar * const*) &vShaderSrc, NULL);
     free(vShaderSrc);
     glCompileShader(vShader);
 
     unsigned int fShader;
     fShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fShader, 1, &fShaderSrc, NULL);
+    // fucked pointer cast fixes Werror=incompatible-pointer-types
+    glShaderSource(fShader, 1, (const GLchar * const*) &fShaderSrc, NULL);
     free(fShaderSrc);
     glCompileShader(fShader);
 
