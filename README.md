@@ -33,10 +33,12 @@ stoff2d_ecs:
 - extendable entity component system (see component.h)
 
 ## Dependencies
-stoff2d_core uses glfw, so throw this in your libs directory alongside it.
+stoff2d_core uses glfw, so throw this in your libs directory alongside it, or 
+install it using your favourite package manager.
 
 ## Build
-Stoff2D is built using CMake, from the command line.
+Stoff2D is built using CMake, from the command line. Binaries will be placed in 
+build/Debug or build
 ```
 > git clone https://github.com/Stoff-Studios/Stoff2D
 > cd Stoff2D
@@ -45,10 +47,10 @@ Stoff2D is built using CMake, from the command line.
 > cmake ..
 > cmake --build .
 ```
-Binaries will be placed in build/Debug or build
 
 ## Example Projects
 To run the example projects, make sure the binary is called from the same 
 directory as the res folder.
+
 Current example games (more to come)
 - shooter
