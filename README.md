@@ -32,6 +32,9 @@ stoff2d_core:
 stoff2d_ecs:
 - extendable entity component system (see component.h)
 
+## Dependencies
+stoff2d_core uses glfw, so throw this in your libs directory alongside it.
+
 ## Build
 Stoff2D is built using CMake, from the command line.
 ```
