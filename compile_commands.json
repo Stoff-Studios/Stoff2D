@@ -1,0 +1,102 @@
+[
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/stoff2d_core/src/stoff2d.c.o -c /home/jesse/dev/Stoff2D/stoff2d_core/src/stoff2d.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_core/src/stoff2d.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/stoff2d_core/src/shader.c.o -c /home/jesse/dev/Stoff2D/stoff2d_core/src/shader.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_core/src/shader.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/stoff2d_core/src/particle.c.o -c /home/jesse/dev/Stoff2D/stoff2d_core/src/particle.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_core/src/particle.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/stoff2d_core/src/animation.c.o -c /home/jesse/dev/Stoff2D/stoff2d_core/src/animation.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_core/src/animation.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/stoff2d_core/src/sprite_renderer.c.o -c /home/jesse/dev/Stoff2D/stoff2d_core/src/sprite_renderer.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_core/src/sprite_renderer.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/vendor/src/cds_exlist.c.o -c /home/jesse/dev/Stoff2D/vendor/src/cds_exlist.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/cds_exlist.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/vendor/src/cds_utils.c.o -c /home/jesse/dev/Stoff2D/vendor/src/cds_utils.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/cds_utils.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/vendor/src/clm.c.o -c /home/jesse/dev/Stoff2D/vendor/src/clm.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/clm.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/vendor/src/glad.c.o -c /home/jesse/dev/Stoff2D/vendor/src/glad.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/glad.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_core.dir/vendor/src/stbi_image.c.o -c /home/jesse/dev/Stoff2D/vendor/src/stbi_image.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/stbi_image.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_ecs.dir/stoff2d_ecs/src/component_map.c.o -c /home/jesse/dev/Stoff2D/stoff2d_ecs/src/component_map.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_ecs/src/component_map.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_ecs.dir/stoff2d_ecs/src/stoff2d_ecs.c.o -c /home/jesse/dev/Stoff2D/stoff2d_ecs/src/stoff2d_ecs.c",
+  "file": "/home/jesse/dev/Stoff2D/stoff2d_ecs/src/stoff2d_ecs.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_ecs.dir/vendor/src/cds_exlist.c.o -c /home/jesse/dev/Stoff2D/vendor/src/cds_exlist.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/cds_exlist.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/vendor/include  -o CMakeFiles/stoff2d_ecs.dir/vendor/src/cds_utils.c.o -c /home/jesse/dev/Stoff2D/vendor/src/cds_utils.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/cds_utils.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/vendor/include -I/home/jesse/dev/Stoff2D/examples/shooter/include  -o CMakeFiles/shooter.dir/examples/shooter/src/entities.c.o -c /home/jesse/dev/Stoff2D/examples/shooter/src/entities.c",
+  "file": "/home/jesse/dev/Stoff2D/examples/shooter/src/entities.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/vendor/include -I/home/jesse/dev/Stoff2D/examples/shooter/include  -o CMakeFiles/shooter.dir/examples/shooter/src/game.c.o -c /home/jesse/dev/Stoff2D/examples/shooter/src/game.c",
+  "file": "/home/jesse/dev/Stoff2D/examples/shooter/src/game.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/vendor/include -I/home/jesse/dev/Stoff2D/examples/shooter/include  -o CMakeFiles/shooter.dir/examples/shooter/src/main.c.o -c /home/jesse/dev/Stoff2D/examples/shooter/src/main.c",
+  "file": "/home/jesse/dev/Stoff2D/examples/shooter/src/main.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/vendor/include -I/home/jesse/dev/Stoff2D/examples/shooter/include  -o CMakeFiles/shooter.dir/examples/shooter/src/particle_types.c.o -c /home/jesse/dev/Stoff2D/examples/shooter/src/particle_types.c",
+  "file": "/home/jesse/dev/Stoff2D/examples/shooter/src/particle_types.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/vendor/include -I/home/jesse/dev/Stoff2D/examples/shooter/include  -o CMakeFiles/shooter.dir/examples/shooter/src/systems.c.o -c /home/jesse/dev/Stoff2D/examples/shooter/src/systems.c",
+  "file": "/home/jesse/dev/Stoff2D/examples/shooter/src/systems.c"
+},
+{
+  "directory": "/home/jesse/dev/Stoff2D/build",
+  "command": "/usr/bin/cc  -I/home/jesse/dev/Stoff2D/stoff2d_core/include -I/home/jesse/dev/Stoff2D/stoff2d_ecs/include -I/home/jesse/dev/Stoff2D/vendor/include -I/home/jesse/dev/Stoff2D/examples/shooter/include  -o CMakeFiles/shooter.dir/vendor/src/clm.c.o -c /home/jesse/dev/Stoff2D/vendor/src/clm.c",
+  "file": "/home/jesse/dev/Stoff2D/vendor/src/clm.c"
+}
+]
