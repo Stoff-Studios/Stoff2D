@@ -31,3 +31,4 @@ void entites_set_game_data_ptr(GameData* gData);
 u32  create_player(clmVec2 position);
 void create_bullet(clmVec2 position, clmVec2 velocity);
 void create_enemy(clmVec2 position);
+void create_skeleton_death_animation(clmVec2 pos);

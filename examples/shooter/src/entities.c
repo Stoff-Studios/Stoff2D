@@ -234,3 +234,50 @@ void create_enemy(clmVec2 position) {
     s2d_ecs_add_component(healthCmp);
     s2d_ecs_add_component(animationCmp);
 }
+
+void create_skeleton_death_animation(clmVec2 pos) {
+    u32 eID = s2d_ecs_create_entity();
+
+    Component animationCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_ANIMATION,
+        .animation = (AnimationComponent) {
+            .animation = s2d_animations_get("skeletonDie"),
+            .aniIndex = 0.0f,
+            .aniSpeed = 15.0f
+        }
+    };
+
+    Component positionCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_POSITION,
+        .position = (PositionComponent) {
+            .position = pos
+        }
+    };
+
+    Component spriteCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_SPRITE,
+        .sprite = (SpriteComponent) {
+            .size = ENEMY_SIZE,
+            .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
+            .texture = gData->texSkeletonDie,
+            .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+            .layer = PLAYER_LAYER
+        }
+    };
+
+    Component deathTimerCmp = (Component) {
+        .eID = eID,
+        .type = CMP_TYPE_DEATH_TIMER,
+        .deathTimer = (DeathTimerComponent) {
+            .timeLeft = 1.0f
+        }
+    };
+
+    s2d_ecs_add_component(positionCmp);
+    s2d_ecs_add_component(spriteCmp);
+    s2d_ecs_add_component(animationCmp);
+    s2d_ecs_add_component(deathTimerCmp);
+}

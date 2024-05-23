@@ -319,6 +319,7 @@ void system_damage() {
                         clm_v2_add(healthHB->hitbox.position,
                                 clm_v2_scalar_mul(0.5f, healthHB->hitbox.size));
                     s2d_particles_add(&pData);
+                    create_skeleton_death_animation(healthHB->hitbox.position);
                     s2d_ecs_delete_entity(healthEID);
                 } else {
                     healthCmp->health.invinsibilityTimer = 

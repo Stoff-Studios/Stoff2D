@@ -73,6 +73,7 @@ void game_init() {
 
     gData.texHitBox       = s2d_load_texture("hitbox.png");
     gData.texSkeletonWalk = s2d_load_texture("skeleton_walk.png");
+    gData.texSkeletonDie  = s2d_load_texture("skeleton_die.png");
     gData.texPlayerIdle   = s2d_load_texture("player_idle.png");
     gData.camZoom  = 500.0f;
     gData.camSpeed = 300.0f;

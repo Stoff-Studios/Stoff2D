@@ -10,6 +10,7 @@ typedef struct {
     u32  texFont;
     u32  texHitBox;
     u32  texSkeletonWalk;
+    u32  texSkeletonDie;
     u32  texPlayerIdle;
 
     f32  camSpeed;
