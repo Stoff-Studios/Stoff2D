@@ -28,7 +28,8 @@ stoff2d_ecs:
 - entity component system
 
 ## Build
-Stoff2D uses CMake, so to build from the command line.
+Stoff2D compiles for Windows/Linux/Mac using CMake.
+To build from the command line.
 ```
 > git clone https://github.com/Stoff-Studios/Stoff2D
 > cd Stoff2D
@@ -37,11 +38,19 @@ Stoff2D uses CMake, so to build from the command line.
 > cmake ..
 > cmake --build .
 ```
-All binaries will be in path/to/build/Debug
+Binaries will be placed in build/Debug or build
 
 ## Example Projects
-To run the example projects, from the root directory run
-```
-> build/Debug/example_project
-```
-For now there is only shooter, more coming soon!
+To run the example projects, make sure the binary is called from the same 
+directory as the res folder.
+Current example games (more to come)
+- shooter
+
+## Project Configuration
+If you want to change some core settings, simply have a look at 
+stoff2d_core/settings.h, here you can change specific folder locations as well
+as max animaiton frames and entities. It is highly recommmended to tailor these
+to your projects needs. 
+
+Make sure the white texture is not removed since it is used for coloured quad
+rendering.
