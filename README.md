@@ -1,56 +1,61 @@
 # Stoff2D
-Stoff2D is a cross platform C library for making games!!!
+Stoff2D is a cross platform C library for making games!!
 
 ## Features and Usage
-Stoff2D is a modular collection of libraries. Each submodule is standalone 
-and does not depend on the others.
+Stoff2D is a modular collection of libraries. Each submodule can be used in
+isolation.
 
-Visit each s2d_X header to see what is available, and checkout the example projects
-in examples to see how stoff2d can be used to create a game. Ofcourse have a peep
-through everything as you please, but only features contained in headers prepended 
-with "s2d" are expected to be called by the user.
+Visit each stoff2d header to see what is available, and checkout the example projects
+in examples to see how stoff2d can be used to create a game. 
 
 To control lower level details like max entites/particles or even quads per draw
 call, have a look at include/settings.h and include/defines.h, here you can also 
-set the resource folder locations.
+set the resource folder locations for your project.
 
 stoff2d_ecs is designed to be extended. To add your own components simply edit 
-components.h and recompile. For this reason I recommend including the source code 
-for stoff2d_ecs as apart of your project (it is quite small).
+components.h and recompile. For this reason I recommend including Stoff2D as a
+submodule.
 
-do NOT remove the white texture in res/textures, this is used by the renderer to
-draw coloured quads. You can move the png just make sure there is a png called
-"white.png" in the S2D_TEXTURE_FOLDER location (see include/settings.h)
+Do not remove the white texture in res/textures, this is used by the renderer to
+draw coloured quads. You can move the png as long as white.png is in the 
+S2D_TEXTURE_FOLDER location (see include/settings.h)
 
 stoff2d_core:
 - windowing and input
-- 2D quad renderer (coloured/textured)
+- coloured/textured quad rendering 
 - sprite layering
 - particle system
-- animations (see README.ani)
+- animation (see res/animations/README.ani)
 
 stoff2d_ecs:
-- extendable entity component system (see component.h)
+- entity component system (see component.h)
 
 ## Dependencies
-stoff2d_core uses glfw, so throw this in your libs directory alongside it, or 
-install it using your favourite package manager.
+- glfw
 
 ## Build
-Stoff2D is built using CMake.
+Stoff2D is built using CMake. Make sure to recursively clone since glfw is a 
+submodule.
 ```
-> git clone https://github.com/Stoff-Studios/Stoff2D
+> git clone https://github.com/Stoff-Studios/Stoff2D --recurse-submodules
 > cd Stoff2D
 > mkdir build
 > cd build
 > cmake ..
 > cmake --build .
 ```
-Binaries will be placed in build/Debug or build
 
 ## Example Projects
+To build the example projects, turn on the BUILD_EXAMPLES option when calling 
+cmake. Just add -DBUILD_EXAMPLES=ON before the source directory.
+```
+> cmake -DBUILD_EXAMPLES=ON ..
+> cmake --build .
+```
 To run the example projects, make sure the binary is called from the same 
-directory as the res folder.
-
+directory as the res folder. For example to run the shooter example (from root)
+```
+build/examples/shooter/Debug/shooter
+```
 Current example games (more to come)
 - shooter

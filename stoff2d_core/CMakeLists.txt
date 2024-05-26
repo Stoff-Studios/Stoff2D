@@ -14,6 +14,6 @@ target_include_directories(stoff2d_core PRIVATE
 target_include_directories(stoff2d_core PUBLIC 
     ${CMAKE_SOURCE_DIR}/include)
 
-target_link_libraries(stoff2d_core PRIVATE glfw)
+target_link_libraries(stoff2d_core PRIVATE glfw cds)
 
-target_link_libraries(stoff2d_core PUBLIC cds clm)
+target_link_libraries(stoff2d_core PUBLIC clm)
