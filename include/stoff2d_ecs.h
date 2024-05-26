@@ -14,6 +14,10 @@ typedef struct {
     u64    tableSize;
 } s2dComponentMap;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* ecs_create_entity
  * -----------------
  * Generate a new eID.
@@ -93,3 +97,7 @@ Component* s2d_component_map_at(s2dComponentMap* map, u64 index);
  * Print all the component buckets and their contents for debugging purposes.
  */
 void s2d_ecs_print_components();
+
+#ifdef __cplusplus
+}
+#endif

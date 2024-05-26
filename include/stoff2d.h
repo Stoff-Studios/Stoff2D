@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Welcome to the stoff2d engine!
  *
  * stoff2d is a C library for making 2D games.
@@ -272,3 +276,7 @@ void s2d_sprite_renderer_add_sprite(s2dSprite sprite);
 void s2d_sprite_renderer_render_sprites();
 
 /*****************************************************************************/
+
+#ifdef __cplusplus
+}
+#endif
