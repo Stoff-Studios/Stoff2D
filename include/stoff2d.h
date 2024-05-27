@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Welcome to the stoff2d engine!
  *
  * stoff2d is a C library for making 2D games.
@@ -12,6 +8,10 @@ extern "C" {
 #include <defines.h>         // Types, keycodes and flags.
 #include <settings.h>        // Settings.
 #include <clm/clm.h>         // Linear algebra.
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /****************************** Init/Shutdown ********************************/
 
@@ -238,7 +238,7 @@ Animation* s2d_animations_get(char* name);
  *
  * count determines how many particles are spawned.
  *
- * The velocity and size of each particle will be normally 
+ * The velocity and size of each particle will be linearly 
  * distributed between,
  * [lowerVelocity, upperVelocity] and
  * [lowerSize, upperSize] respectively.
@@ -248,19 +248,22 @@ Animation* s2d_animations_get(char* name);
  */
 void s2d_particles_add(ParticleData* particlesData);
 
+/* s2d_particles_render
+ * --------------------
+ * Render all particles to the screen.
+ */
 void s2d_particles_render();
-
 
 /*****************************************************************************/
 
 
 /**************************** Sprite Renderer ********************************/
 
-/* The purpose of this is to order sprites by layer so we can render them in
- * the correct order without having to worry about it.
+/* Using the sprite renderer allows control over sprite layers. If this is not
+ * needed just use s2d_render_quad since it is a little faster.
  *
- * For example sprites with a layer of 0 will always be rendered before anything
- * else so we can just set a layer and chill.
+ * Sprites with a layer of 0 are on top, the higher the layer number the
+ * further back the sprite.
  */
 
 /* sprite_renderer_add_sprite

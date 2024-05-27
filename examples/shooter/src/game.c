@@ -60,7 +60,7 @@ void game_update(f32 timeStep) {
 }
 
 void game_init() {
-    if (!s2d_initialise_engine("Paralysis")) {
+    if (!s2d_initialise_engine("Shooter")) {
         fprintf(stderr, "Could not initialise stoff2d\n");
         exit(1);
     }

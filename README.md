@@ -33,7 +33,7 @@ stoff2d_ecs:
 ## Dependencies
 - glfw
 
-Linux users need to install some glfw dependencies, check out the
+Linux users may need to install some glfw dependencies, check out the
 Installing Dependencies section here https://www.glfw.org/docs/latest/compile.html
 if you get errors.
 
@@ -56,10 +56,23 @@ cmake. Just add -DBUILD_EXAMPLES=ON before the source directory.
 > cmake -DBUILD_EXAMPLES=ON ..
 > cmake --build .
 ```
-To run the example projects, make sure the binary is called from the same 
-directory as the res folder. For example to run the shooter example (from root)
-```
-build/examples/shooter/Debug/shooter
-```
+To run the example games, make sure the binary is called from the root
+(checkout settings.h to change resource locations).
+
 Current example games (more to come)
-- shooter
+#### Shooter
+*controls*
+- move           -> wasd
+- shoot          -> arrow-keys
+- pause          -> p
+- resume         -> r
+- show hitboxes  -> h
+- zoom in        -> i
+- zoom out       -> o
+- fullscreen     -> f
+- windowed       -> v
+- quit           -> q
+
+## Future Plans
+- stoff2d_core: text-rendering
+- stoff2d_audio: (NEW) 

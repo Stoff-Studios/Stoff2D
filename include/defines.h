@@ -103,7 +103,7 @@ typedef struct {
     f32 h;
 } Frame;
 
-// An Animation is a sequence of Frames which index into an array
+// An Animation is a sequence of Frames
 typedef struct {
     Frame frames[S2D_MAX_ANIMATION_FRAMES];
     u32   frameCount;
