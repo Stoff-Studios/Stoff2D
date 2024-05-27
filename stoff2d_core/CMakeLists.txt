@@ -1,15 +1,16 @@
 add_library(stoff2d_core
-    animation.c
-    glad.c
-    particle.c
-    shader.c
-    sprite_renderer.c
-    stbi_image.c
-    stoff2d.c)
+    src/animation.c
+    src/glad.c
+    src/particle.c
+    src/shader.c
+    src/sprite_renderer.c
+    src/stbi_image.c
+    src/stoff2d.c)
 
 target_include_directories(stoff2d_core PRIVATE 
     "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/glad"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../vendor")
+    "${CMAKE_CURRENT_SOURCE_DIR}/../vendor"
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 target_include_directories(stoff2d_core PUBLIC 
     "${CMAKE_CURRENT_SOURCE_DIR}/../include")
