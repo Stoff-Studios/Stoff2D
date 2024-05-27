@@ -153,7 +153,7 @@ void s2d_ecs_print_components() {
 
 /**************************** INIT/SHUTDOWN **********************************/
 
-void ecs_init() {
+void s2d_ecs_initialise() {
     // Component masks.
     memset(componentMasks, 0, sizeof(componentMasks));
     componentMasks[0] = 0x00000001;
@@ -173,7 +173,7 @@ void ecs_init() {
     }
 }
 
-void ecs_shutdown() {
+void s2d_ecs_shutdown() {
     // Recycled eIDs.
     cds_exlist_destroy(recycledIDs);
 

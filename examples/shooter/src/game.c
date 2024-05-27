@@ -1,5 +1,6 @@
 #include <game.h>
 #include <stoff2d.h>
+#include <stoff2d_ecs.h>
 #include <systems.h>
 #include <entities.h>
 #include <particle_types.h>
@@ -64,6 +65,7 @@ void game_init() {
         fprintf(stderr, "Could not initialise stoff2d\n");
         exit(1);
     }
+    s2d_ecs_initialise();
     s2d_set_flags(S2D_LOG_STATS);
     s2d_clear_colour(CLEAR_COLOUR);
 
@@ -96,4 +98,5 @@ void game_run() {
 
 void game_shutdown() {
     s2d_shutdown_engine();
+    s2d_ecs_shutdown();
 }

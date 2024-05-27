@@ -18,6 +18,18 @@ typedef struct {
 extern "C" {
 #endif
 
+/* s2d_ecs_initialise
+ * ------------------
+ * intialise the entity component system.
+ */
+void s2d_ecs_initialise();
+
+/* s2d_ecs_shutdown
+ * ----------------
+ * shutdown the entity component system.
+ */
+void s2d_ecs_shutdown();
+
 /* ecs_create_entity
  * -----------------
  * Generate a new eID.

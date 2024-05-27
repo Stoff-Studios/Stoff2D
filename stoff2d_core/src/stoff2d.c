@@ -75,10 +75,6 @@ void animations_init();
 void particles_init();
 void particles_update(f32 timeStep);
 
-// ECS.
-void ecs_init();
-void ecs_shutdown();
-
 // Sprite Renderer.
 void sprite_renderer_init();
 void sprite_renderer_shutdown();
@@ -165,9 +161,6 @@ bool s2d_initialise_engine(const char* programName) {
 
     // Initialise particle system.
     particles_init();
-
-    // Initialise the ecs.
-    ecs_init();
 
     // Load white texture for coloured quads.
     engine.whiteTex = s2d_load_texture("white.png");
@@ -323,7 +316,6 @@ void s2d_render_coloured_quad(
 void s2d_shutdown_engine() {
     glfwDestroyWindow(engine.winPtr);
     sprite_renderer_shutdown();
-    ecs_shutdown();
     glfwTerminate();
 }
 
