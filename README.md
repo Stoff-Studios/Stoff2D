@@ -33,6 +33,10 @@ stoff2d_ecs:
 ## Dependencies
 - glfw
 
+Linux users need to install some glfw dependencies, check out the
+Installing Dependencies section here https://www.glfw.org/docs/latest/compile.html
+if you get errors.
+
 ## Build
 Stoff2D is built using CMake. Make sure to recursively clone since glfw is a 
 submodule.
