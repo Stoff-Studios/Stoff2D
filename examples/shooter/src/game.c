@@ -1,5 +1,5 @@
 #include <game.h>
-#include <stoff2d.h>
+#include <stoff2d_core.h>
 #include <stoff2d_ecs.h>
 #include <systems.h>
 #include <entities.h>

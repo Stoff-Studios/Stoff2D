@@ -1,4 +1,4 @@
-#include <stoff2d.h>
+#include <stoff2d_core.h>
 
 #include <GLFW/glfw3.h>
 #include <string.h>

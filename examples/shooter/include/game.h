@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stoff2d.h>
+#include <stoff2d_core.h>
 
 typedef struct {
     bool running;

@@ -1,4 +1,4 @@
-#include <stoff2d.h>
+#include <stoff2d_core.h>
 #include <cds/cds_exlist.h>
 
 // Extensible list of sprites to render each frame.

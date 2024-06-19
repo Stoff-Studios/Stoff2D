@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stoff2d.h>
+#include <stoff2d_core.h>
 #include <shader.h>
 #include <stbi/stbi_image.h>
 
