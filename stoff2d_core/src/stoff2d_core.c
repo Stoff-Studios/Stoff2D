@@ -2,11 +2,13 @@
 #include <GLFW/glfw3.h>
 #include <stoff2d_core.h>
 #include <shader.h>
+#include <font.h>
 #include <stbi/stbi_image.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 typedef struct {
     // Internal flags
@@ -78,7 +80,6 @@ void particles_update(f32 timeStep);
 // Sprite Renderer.
 void sprite_renderer_init();
 void sprite_renderer_shutdown();
-
 
 /*****************************************************************************/
 
@@ -161,6 +162,11 @@ bool s2d_initialise_engine(const char* programName) {
 
     // Initialise particle system.
     particles_init();
+
+    // Initialise fonts.
+    if (!font_init()) {
+        return false;
+    }
 
     // Load white texture for coloured quads.
     engine.whiteTex = s2d_load_texture("white.png");
@@ -316,6 +322,7 @@ void s2d_render_coloured_quad(
 void s2d_shutdown_engine() {
     glfwDestroyWindow(engine.winPtr);
     sprite_renderer_shutdown();
+    font_shutdown();
     glfwTerminate();
 }
 
@@ -586,3 +593,62 @@ clmMat4 camera_view() {
 }
 
 /*****************************************************************************/
+
+
+
+/**************************** Font and Text **********************************/
+
+void s2d_text_render(
+        const char* fontName,
+        clmVec2     position,
+        clmVec4     colour,
+        u32         layer,
+        const char* formatText,
+        ...) {
+    // query font.
+    s2dFont* font;
+    if (!(font = font_get_font(fontName))) {
+        fprintf(stderr, "[S2D Warning] tried to render text with non-existent "
+                "font - %s\n", fontName);
+        return;
+    }
+
+    // format string with args.
+    char buffer[4096];
+    va_list aptr;
+    va_start(aptr, formatText);
+    int result = vsprintf(buffer, formatText, aptr);
+    va_end(aptr);
+
+    if (result < 0) {
+        fprintf(stderr, 
+                "[S2D Warning] could not format string when rendering text\n");
+    }
+
+    // now render each charater using sprite renderer.
+    for (u32 i = 0; i < strlen(buffer); i++) {
+        if (buffer[i] > 127) {
+            fprintf(stderr,
+                    "[S2D Error] character \'%c\' is above ASCII limit 127, "
+                    "skipped rendering\n",
+                    buffer[i]);
+            continue;
+        }
+        s2dChar c = font->chars[buffer[i]];
+        s2dSprite glyphSprite = (s2dSprite) {
+            .position = (clmVec2) { 
+                position.x + c.bearingX, position.y + c.bearingY - c.height 
+            },
+            .size     = (clmVec2) { c.width, c.height },
+            .colour   = colour,
+            .texture  = c.texID,
+            .frame    = (Frame) { 0.0f, 1.0f, 1.0f, -1.0f },
+            .layer    = layer
+        };
+        s2d_sprite_renderer_add_sprite(glyphSprite);
+        position.x += c.advance >> 6;
+    }
+}
+
+/*****************************************************************************/
+

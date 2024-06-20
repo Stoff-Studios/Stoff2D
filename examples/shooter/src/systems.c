@@ -84,6 +84,14 @@ void system_render() {
         }
     }
 
+    s2d_text_render(
+            "Roboto-Bold",
+            (clmVec2) { 0.0f, 0.0f },
+            (clmVec4) { 1.0f, 0.0f, 0.0f, 1.0f },
+            TEXT_LAYER,
+            "Sample Text!"
+            );
+
     s2d_sprite_renderer_render_sprites();
     s2d_particles_render();
 }

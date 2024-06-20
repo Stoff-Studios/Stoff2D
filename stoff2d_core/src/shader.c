@@ -14,7 +14,8 @@ char* read_shader_file(const char* filePath) {
     // Check for errors.
     if (!srcFile) {
         fprintf(stderr,
-                "couldn't open shader file\n");
+                "[S2D Error] couldn't open shader file %s\n",
+                filePath);
         return NULL;
     }
 

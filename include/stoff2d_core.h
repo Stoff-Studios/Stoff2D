@@ -100,6 +100,29 @@ u32 s2d_load_texture(const char* fileName);
  */
 void s2d_clear_colour(clmVec4 colour);
 
+/* s2d_text_render
+ * ---------------
+ * Render text to the screen.
+ *
+ * fontName: 
+ *     name of a font in the fonts folder, not including .ttf extension
+ * position:
+ *     screen space position in pixels
+ * colour:
+ *     colour of the text.
+ * layer:
+ *     sprite layer
+ * formatText:
+ *     null terminated format string, format arguments go after this.
+ */
+void s2d_text_render(
+        const char* fontName,
+        clmVec2     position,
+        clmVec4     colour,
+        u32         layer,
+        const char* formatText,
+        ...);
+
 /*****************************************************************************/
 
 
@@ -277,6 +300,7 @@ void s2d_sprite_renderer_add_sprite(s2dSprite sprite);
  * Draw all the previously added sprites ordered by layer.
  */
 void s2d_sprite_renderer_render_sprites();
+
 
 /*****************************************************************************/
 

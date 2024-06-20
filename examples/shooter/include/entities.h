@@ -22,9 +22,10 @@
 #define ENEMY_INVINSIBILITY_TIME 0.1f
 
 // Layers
-#define HITBOX_LAYER 0
-#define ENEMY_LAYER  1
-#define PLAYER_LAYER 2
+#define TEXT_LAYER   0
+#define HITBOX_LAYER 1
+#define ENEMY_LAYER  2
+#define PLAYER_LAYER 3
 
 void entites_set_game_data_ptr(GameData* gData);
 
