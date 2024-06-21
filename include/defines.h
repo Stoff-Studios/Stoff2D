@@ -140,18 +140,5 @@ typedef struct {
 
 /***************************** Font and Text *********************************/
 
-typedef struct {
-    u32 texID;
-    i32 width; 
-    i32 height; 
-    i32 bearingX; // offset from baseline to topleft of glyph.
-    i32 bearingY;
-    u32 advance;
-} s2dChar;
-
-typedef struct {
-    char*   fontName;
-    s2dChar chars[128]; // first 128 ASCII characters for now.
-} s2dFont;
 
 /*****************************************************************************/

@@ -143,10 +143,16 @@ bool s2d_initialise_engine(const char* programName) {
         return false;
     }
 
-    glViewport(0, 0, engine.winWidth, engine.winHeight);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Initialise fonts.
+    if (!font_init()) {
+        return false;
+    }
+
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glViewport(0, 0, engine.winWidth, engine.winHeight);
 
     // Set Callbacks.
     glfwSetFramebufferSizeCallback(engine.winPtr, framebuffer_size_callback);
@@ -163,10 +169,6 @@ bool s2d_initialise_engine(const char* programName) {
     // Initialise particle system.
     particles_init();
 
-    // Initialise fonts.
-    if (!font_init()) {
-        return false;
-    }
 
     // Load white texture for coloured quads.
     engine.whiteTex = s2d_load_texture("white.png");
@@ -639,11 +641,11 @@ void s2d_text_render(
             .position = (clmVec2) { 
                 position.x + c.bearingX, position.y + c.bearingY - c.height 
             },
-            .size     = (clmVec2) { c.width, c.height },
-            .colour   = colour,
-            .texture  = c.texID,
-            .frame    = (Frame) { 0.0f, 1.0f, 1.0f, -1.0f },
-            .layer    = layer
+            .size    = (clmVec2) { c.width, c.height },
+            .texture = font->fontTexID,
+            .colour  = colour,
+            .frame   = c.texRegion,
+            .layer   = layer
         };
         s2d_sprite_renderer_add_sprite(glyphSprite);
         position.x += c.advance >> 6;
