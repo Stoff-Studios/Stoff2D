@@ -26,6 +26,7 @@ stoff2d_core:
 - sprite layering
 - particle system
 - animation (see res/animations/README.ani)
+- text rendering
 
 stoff2d_ecs:
 - entity component system (see component.h)
@@ -33,13 +34,12 @@ stoff2d_ecs:
 ## Dependencies
 - glfw
 
-Linux users may need to install some glfw dependencies, check out the
-Installing Dependencies section here https://www.glfw.org/docs/latest/compile.html
-if you get errors.
+Linux users will need some glfw dependencies, check out the
+Installing Dependencies section here if you get errors.
+https://www.glfw.org/docs/latest/compile.html
 
 ## Build
-Stoff2D is built using CMake. Make sure to recursively clone since glfw is a 
-submodule.
+Stoff2D is built using CMake. Make sure to recursively clone.
 ```
 > git clone https://github.com/Stoff-Studios/Stoff2D --recurse-submodules
 > cd Stoff2D
@@ -74,5 +74,5 @@ Current example games (more to come)
 - quit           -> q
 
 ## Future Plans
-- stoff2d_core: text-rendering
-- stoff2d_audio: (NEW) 
+- stoff2d_audio: (NEW MODULE) 
+- stoff2d_core: remove white texture and just create one on startup.
