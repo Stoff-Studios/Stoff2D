@@ -42,7 +42,7 @@ void setup_gl_for_render_to_texture() {
         0.0f,
         RENDER_TEX_H,
         0.0f,
-        10.0f);
+        1.0f);
     shader_set_uniform_mat4(
         shader,
         "projection",
@@ -71,7 +71,8 @@ u32 new_rendertexture_framebuffer() {
             GL_UNSIGNED_BYTE,
             0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+            GL_LINEAR_MIPMAP_LINEAR);
     glFramebufferTexture(
             GL_FRAMEBUFFER,
             GL_COLOR_ATTACHMENT0,
@@ -90,8 +91,6 @@ u32 new_rendertexture_framebuffer() {
     return renderedTexture;
 }
 
-// TODO: this needs to render all glyph bitmaps to one texture, and generate
-// the frames.
 bool load_font(s2dFont* font, const char* fileName) {
     // create new framebuffer to render to
     u32 renderTexture = new_rendertexture_framebuffer();
@@ -119,10 +118,12 @@ bool load_font(s2dFont* font, const char* fileName) {
         return false;
     }
     free(fontPath);
-    FT_Set_Pixel_Sizes(face, 0, 16); // TODO: make this configurable
+    FT_Set_Pixel_Sizes(face, 0, 40); // TODO: make this configurable
     
-    f32 x = 0;
-    f32 y = 0;
+    f32 x    = 0;
+    f32 y    = 0;
+    u32 rowH = 0; // the max height from all glyphs in each row.
+    u32 padding = 2;
     for (u8 c = 0; c < 128; c++) {
         // load character glyph 
         if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
@@ -133,7 +134,7 @@ bool load_font(s2dFont* font, const char* fileName) {
             continue;
         }
 
-        // generate texture
+        // generate glyph texture.
         u32 texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -148,18 +149,25 @@ bool load_font(s2dFont* font, const char* fileName) {
                 GL_UNSIGNED_BYTE,
                 face->glyph->bitmap.buffer
                 );
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+        // width and height of this glyph.
         float w = face->glyph->bitmap.width;
         float h = face->glyph->bitmap.rows;
 
-        // wrap coords
+        // start new row if we hit the right edge of texture.
         if (x + w > RENDER_TEX_W) {
             x = 0.0f;
-            y += 20.0f;
+            y += rowH + padding;
+            rowH = 0;
+        }
+
+        // update row height. 
+        if (h > rowH) {
+            rowH = h;
         }
 
         float vertices[6][4] = {
@@ -171,16 +179,6 @@ bool load_font(s2dFont* font, const char* fileName) {
             { x + w, y,       1.0f, 1.0f },
             { x + w, y + h,   1.0f, 0.0f }           
         };
-
-        //float vertices[6][4] = {
-        //    { 0, RENDER_TEX_H,  0.0f, 0.0f },            
-        //    { 0,            0,  0.0f, 1.0f },
-        //    { RENDER_TEX_W, 0,  1.0f, 1.0f },
-
-        //    { 0, RENDER_TEX_H,  0.0f, 0.0f },
-        //    { RENDER_TEX_W, 0,  1.0f, 1.0f },
-        //    { RENDER_TEX_W, RENDER_TEX_H, 1.0f, 0.0f }           
-        //};
 
         glBindVertexArray(vao);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -208,6 +206,9 @@ bool load_font(s2dFont* font, const char* fileName) {
     }
 
     FT_Done_Face(face);
+
+    glBindTexture(GL_TEXTURE_2D, renderTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     return true;
 }

@@ -47,6 +47,7 @@ void game_update(f32 timeStep) {
         gData.renderHitboxes = false;
     }
 
+
     system_control();
     system_spawn_enemies(timeStep);
     system_enemy(timeStep);
@@ -57,7 +58,7 @@ void game_update(f32 timeStep) {
     system_damage();
     system_animation(timeStep);
     system_particles(timeStep);
-    system_render();
+    system_render(timeStep);
 }
 
 void game_init() {

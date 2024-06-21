@@ -3,6 +3,7 @@
 #include <entities.h>
 #include <particle_types.h>
 #include <stdlib.h>
+#include <math.h>
 
 static GameData* gData;
 
@@ -31,7 +32,7 @@ bool hitboxes_collided(HitBoxComponent a, HitBoxComponent b) {
             aBottom > bTop);
 }
 
-void system_render() {
+void system_render(f32 timeStep) {
     s2dComponentMap* spriteCmps = s2d_ecs_get_bucket(CMP_TYPE_SPRITE);
     for (u64 i = 0; i < s2d_component_map_tablesize(spriteCmps); i++) {
         Component* spriteCmp = s2d_component_map_at(spriteCmps, i);
@@ -84,14 +85,27 @@ void system_render() {
         }
     }
 
+    // Render text like this. Specify any font in the fonts folder.
+    static f32 x = 0.0f;
+    clmVec2 textPos = s2d_camera_get_pos();
+    textPos.x -= s2d_screen_dimensions().x / 16;
+    textPos.y += s2d_screen_dimensions().y / 8;
     s2d_text_render(
-            "Roboto-Bold",
-            (clmVec2) { 0.0f, 0.0f },
-            (clmVec4) { 0.0f, 0.0f, 1.0f, 1.0f },
-            TEXT_LAYER,
-            "Sample Text! %d",
-            10
+            "zerovelo",                           // font family
+            textPos,                              // position (world)
+            (clmVec4) { fabs(sinf(x)), fabs(cosf(2 * x)), fabs(sinf(3*x)), 1.0f }, // colour
+            TEXT_LAYER,                           // sprite layer
+            "%s",                                 // format string
+            "Stoff2D"                             // optional format args
             );
+    x += 2 * timeStep;
+
+    //s2d_text_render_bitmap(
+    //        "Roboto-Bold",
+    //        (clmVec2) { 0.0f, 0.0f },             // position (world)
+    //        (clmVec2) { 256.0f, 256.0f },         // size
+    //        (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f }  // colour
+    //        );
 
     s2d_sprite_renderer_render_sprites();
     s2d_particles_render();

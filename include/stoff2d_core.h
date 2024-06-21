@@ -123,6 +123,26 @@ void s2d_text_render(
         const char* formatText,
         ...);
 
+/* s2d_text_render_bitmap
+ * ----------------------
+ * Debug function to render the bitmap generated from a ttf font loaded from
+ * the S2D_FONTS_FOLDER.
+ *
+ * fontName: 
+ *     name of a font in the fonts folder, not including .ttf extension
+ * position:
+ *     world space position
+ * size:
+ *     size in pixels to render the bitmap
+ * colour:
+ *     colour of the text.
+ */
+void s2d_text_render_bitmap(
+        const char* fontName,
+        clmVec2     position,
+        clmVec2     size,
+        clmVec4     colour);
+
 /*****************************************************************************/
 
 
@@ -200,6 +220,12 @@ clmVec2 s2d_mouse_pos();
  * Return the current position of the mouse in world coordinates.
  */
 clmVec2 s2d_mouse_world_pos();
+
+/* s2d_screen_dimensions
+ * ---------------------
+ * Returns the width and height of the viweport in pixels.
+ */
+clmVec2 s2d_screen_dimensions();
 
 /*****************************************************************************/
 

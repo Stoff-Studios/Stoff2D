@@ -513,6 +513,13 @@ void s2d_window_windowed() {
             engine.refreshRate);
 }
 
+clmVec2 s2d_screen_dimensions() {
+    return (clmVec2) {
+        .x = engine.winWidth,
+        .y = engine.winHeight
+    };
+}
+
 /*****************************************************************************/
 
 
@@ -599,6 +606,28 @@ clmMat4 camera_view() {
 
 
 /**************************** Font and Text **********************************/
+
+void s2d_text_render_bitmap(
+        const char* fontName,
+        clmVec2     position,
+        clmVec2     size,
+        clmVec4     colour) {
+    // query font.
+    s2dFont* font;
+    if (!(font = font_get_font(fontName))) {
+        fprintf(stderr, "[S2D Warning] tried to render text with non-existent "
+                "font - %s\n", fontName);
+        return;
+    }
+
+    s2d_render_quad(
+            position,
+            size,
+            colour,
+            font->fontTexID,
+            (Frame) { 0.0f, 0.0f, 1.0f, 1.0f }
+            );
+}
 
 void s2d_text_render(
         const char* fontName,
