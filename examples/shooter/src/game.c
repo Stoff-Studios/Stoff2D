@@ -58,6 +58,7 @@ void game_update(f32 timeStep) {
     system_damage();
     system_animation(timeStep);
     system_particles(timeStep);
+    system_fps(timeStep);
     system_render(timeStep);
 }
 

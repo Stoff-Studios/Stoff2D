@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <ft2build.h>
 #include <shader.h>
+#include <utils.h>
 #include FT_FREETYPE_H
 
 #define RENDER_TEX_W 1024
@@ -214,40 +215,37 @@ bool load_font(s2dFont* font, const char* fileName) {
 }
 
 bool font_init() {
-    // Initialise freetype.
+    setup_gl_for_render_to_texture();
+    memset(fonts, 0, sizeof(fonts));
     if (FT_Init_FreeType(&ftLib)) {
         fprintf(stderr, "[S2D Error] could not load freetype library\n");
         return false;
     }
 
-    // Init opengl
-    setup_gl_for_render_to_texture();
-
-    // clear out fonts.
-    memset(fonts, 0, sizeof(fonts));
-
-    // load all ttf fonts in S2D_FONTS_FOLDER
-    struct dirent* dirEntry;
-    DIR* dir;
-    if (!(dir = opendir(S2D_FONTS_FOLDER))) { 
-        fprintf(stderr, 
-                "[S2D Error] could not open fonts folder - %s\n", 
-                S2D_FONTS_FOLDER); 
-        return false; 
-    } 
-    while ((dirEntry = readdir(dir))) {
+    char** files    = list_files_in_dir(S2D_FONTS_FOLDER);
+    char** filesCpy = files;
+    char*  fileName;
+    bool result = true;
+    while ((fileName = *files++)) {
+        // skip until the end if failed already. Need to free everything still.
+        if (!result) {
+            free(fileName);
+            continue;
+        }
         // Check if exceeded font limit.
         if (fontCount > S2D_MAX_FONTS) {
             fprintf(stderr,
                     "[S2D Error] exceeded font limit, increase this in "
                     "settings.h");
-            return false;
-        }
-
-        const char* fileName = dirEntry->d_name;
-        if (!strcmp(".", fileName) || !strcmp("..", fileName)) {
+            result = false;
+            free(fileName);
             continue;
-        }
+        } 
+        // filter out current and previous directory listing.
+        if (!strcmp(".", fileName) || !strcmp("..", fileName)) {
+            free(fileName);
+            continue;
+        } 
         // Check if each file name is a valid ttf file before processing.
         i32 nameLength = strlen(fileName);
         i32 end = nameLength - 1;
@@ -260,20 +258,26 @@ bool font_init() {
                     "[S2D Error] font file %s must have a name and be a ttf "
                     "font\n",
                     fileName);
-            return false;
+            result = false;
+            free(fileName);
+            continue;
         }
         // Load the font.
         if (!load_font(&fonts[fontCount++], fileName)) {
-            return false;
+            result = false;
+            free(fileName);
+            continue;
         }
+        // reached if no errors.
+        free(fileName);
     }
 
-    closedir(dir);     
+    free(filesCpy);
     FT_Done_FreeType(ftLib);
-
+    // Finished rendering to textures.
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-    return true;
+    return result;
 }
 
 void font_shutdown() {

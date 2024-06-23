@@ -85,23 +85,29 @@ void system_render(f32 timeStep) {
         }
     }
 
-    // Render text like this. Specify any font in the fonts folder.
     static f32 x = 0.0f;
     clmVec2 textPos = s2d_camera_get_pos();
     textPos.x -= s2d_screen_dimensions().x / 16;
     textPos.y += s2d_screen_dimensions().y / 8;
+    // Render text like this. Specify any font in the fonts folder.
     s2d_text_render(
-            "zerovelo",                           // font family
-            textPos,                              // position (world)
-            (clmVec4) { fabs(sinf(x)), fabs(cosf(2 * x)), fabs(sinf(3*x)), 1.0f }, // colour
-            TEXT_LAYER,                           // sprite layer
-            "%s",                                 // format string
-            "Stoff2D"                             // optional format args
+            "zerovelo",            // font family
+            textPos,               // position (world)
+            (clmVec4) {            // text colour
+                fabs(sinf(x)),    
+                fabs(cosf(2 * x)), 
+                fabs(sinf(3*x)), 
+                1.0f 
+            },
+            TEXT_LAYER,            // sprite layer
+            "%s",                  // format string
+            "Stoff2D"              // optional format args
             );
     x += 2 * timeStep;
 
+    //// uncomment this to see the bitmap generated for this font.
     //s2d_text_render_bitmap(
-    //        "Roboto-Bold",
+    //        "zerovelo",
     //        (clmVec2) { 0.0f, 0.0f },             // position (world)
     //        (clmVec2) { 256.0f, 256.0f },         // size
     //        (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f }  // colour
@@ -392,4 +398,31 @@ void system_animation(f32 timeStep) {
                 animationCmp->animation.animation->frames[(u64) animationCmp->animation.aniIndex];
         }
     }
+}
+
+void system_fps(f32 timeStep) {
+    static i32 frames = 0;
+    static i32 displayFrames = 0;
+    static f32 time   = 0.0f;
+
+    frames++;
+    time += timeStep;
+
+    if (time >= 1.0f) {
+        displayFrames = frames;
+        frames = 0;
+        time   = 0.0f;
+    }
+
+    clmVec2 pos = s2d_camera_get_pos();
+    pos.x -= s2d_screen_dimensions().x / 2;
+    pos.y += s2d_screen_dimensions().y / 2 - 10;
+    s2d_text_render(
+            "Roboto-Bold",
+            pos,
+            (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f },
+            TEXT_LAYER,
+            "fps: %d",
+            displayFrames
+            );
 }

@@ -16,3 +16,4 @@ void system_invinsibility(f32 timeStep);
 void system_move_hitboxes();
 void system_spawn_enemies(f32 timeStep);
 void system_animation(f32 timeStep);
+void system_fps(f32 timeStep);
