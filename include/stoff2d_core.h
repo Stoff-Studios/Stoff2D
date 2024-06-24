@@ -135,6 +135,7 @@ void s2d_text_render(
         const char* fontName,
         clmVec2     position,
         clmVec4     colour,
+        f32         scale,
         u32         layer,
         const char* formatText,
         ...);

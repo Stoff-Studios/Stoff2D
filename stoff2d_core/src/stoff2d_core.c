@@ -677,6 +677,7 @@ void s2d_text_render(
         const char* fontName,
         clmVec2     position,
         clmVec4     colour,
+        f32         scale,
         u32         layer,
         const char* formatText,
         ...) {
@@ -712,10 +713,10 @@ void s2d_text_render(
         s2dChar c = font->chars[buffer[i]];
         s2dSprite glyphSprite = (s2dSprite) {
             .position = (clmVec2) { 
-                .x = position.x + c.bearingX, 
-                .y = position.y + c.bearingY - c.height 
+                .x = position.x + (c.bearingX * scale), 
+                .y = position.y + ((c.bearingY - c.height) * scale)
             },
-            .size    = (clmVec2) { c.width, c.height },
+            .size    = (clmVec2) { scale * c.width, scale * c.height },
             .texture = font->fontTexID,
             .colour  = colour,
             .frame   = c.texRegion,
@@ -723,7 +724,7 @@ void s2d_text_render(
             .shader  = engine.textShader
         };
         s2d_sprite_renderer_add_sprite(glyphSprite);
-        position.x += c.advance >> 6;
+        position.x += (c.advance >> 6) * scale;
     }
 }
 

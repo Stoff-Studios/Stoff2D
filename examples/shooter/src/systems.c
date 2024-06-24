@@ -92,8 +92,8 @@ void system_render(f32 timeStep) {
     s2d_text_render(
             "zerovelo",            
             (clmVec2) { 
-                .x = s2d_get_viewport_dimensions().x * 0.45f,
-                .y = s2d_get_viewport_dimensions().y - 50
+                .x = s2d_get_viewport_dimensions().x * 0.38f,
+                .y = s2d_get_viewport_dimensions().y - 100
             },
             (clmVec4) {            
                 fabs(sinf(x)),    
@@ -101,6 +101,7 @@ void system_render(f32 timeStep) {
                 fabs(sinf(3*x)), 
                 1.0f 
             },
+            2.0f,
             TEXT_LAYER,
             "%s", 
             "Stoff2D"
@@ -404,7 +405,7 @@ void system_fps(f32 timeStep) {
     frames++;
     time += timeStep;
 
-    if (time >= 1.0f) {
+    if (time >= 0.25f) {
         displayFrames = frames;
         frames = 0;
         time   = 0.0f;
@@ -415,8 +416,9 @@ void system_fps(f32 timeStep) {
             "Roboto-Bold",
             (clmVec2) { 10.0f, 12.0f },
             (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f },
+            0.5f,
             TEXT_LAYER,
             "fps: %d",
-            displayFrames
+            4 * displayFrames
             );
 }
