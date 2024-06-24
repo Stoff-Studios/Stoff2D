@@ -30,7 +30,8 @@ void s2d_sprite_renderer_render_sprites() {
                     sprite->size,
                     sprite->colour,
                     sprite->texture,
-                    sprite->frame);
+                    sprite->frame,
+                    sprite->shader);
         }
     }
     cds_exlist_clear(sprites);

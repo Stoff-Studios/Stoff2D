@@ -117,6 +117,7 @@ typedef struct {
     u32     texture;
     Frame   frame;
     u8      layer;
+    u32     shader;
 } s2dSprite;
 
 /*****************************************************************************/

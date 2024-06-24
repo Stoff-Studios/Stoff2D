@@ -33,6 +33,18 @@ void s2d_shutdown_engine();
 
 /******************************** Rendering **********************************/
 
+/* s2d_get_quad_shader
+ * -------------------
+ * Returns the default quad shader id used by the engine.
+ */
+u32 s2d_get_quad_shader();
+
+/* s2d_get_quad_shader
+ * -------------------
+ * Returns the default text shader used by the engine.
+ */
+u32 s2d_get_text_shader();
+
 /* s2d_render_quad
  * ---------------
  * Render a textured quad. 
@@ -53,16 +65,20 @@ void s2d_shutdown_engine();
  *     no texture. Although it is better to use s2d_render_coloured_quad in this 
  *     case.
  * 
- * Frame:
+ * frame:
  *     normalised region of the texture to render. Frame = { 0, 0, 1, 1 } is
  *     the entire texture.
+ * 
+ * shader:
+ *     shader program to use for this quad.
  */
 void s2d_render_quad(
         clmVec2 position,
         clmVec2 size,
         clmVec4 colour,
         u32     texture,
-        Frame   frame);
+        Frame   frame,
+        u32     shader);
 
 /* s2d_render_coloured_quad
  * ------------------------
@@ -221,11 +237,19 @@ clmVec2 s2d_mouse_pos();
  */
 clmVec2 s2d_mouse_world_pos();
 
-/* s2d_screen_dimensions
+/* s2d_get_screen_rect()
  * ---------------------
- * Returns the width and height of the viweport in pixels.
+ * Returns the worldspace rect for the currently visible viewport.
+ * First two values are bottomleft coordinates, followed by width and height.
  */
-clmVec2 s2d_screen_dimensions();
+clmVec4 s2d_get_screen_rect();
+
+/* s2d_get_viewport_dimensions
+ * ---------------------------
+ * Returns the current width and height of the viewport.
+ * Useful for UI placement.
+ */
+clmVec2 s2d_get_viewport_dimensions();
 
 /*****************************************************************************/
 

@@ -61,7 +61,8 @@ void system_render(f32 timeStep) {
                     .colour = colour,
                     .texture = spriteCmp->sprite.texture,
                     .frame = spriteCmp->sprite.frame,
-                    .layer = spriteCmp->sprite.layer
+                    .layer = spriteCmp->sprite.layer,
+                    .shader = s2d_get_quad_shader()
                     }
                 );
     }
@@ -80,38 +81,30 @@ void system_render(f32 timeStep) {
                         .colour = (clmVec4) { 1.0f, 0.0f, 0.0f, 1.0f },
                         .texture = gData->texHitBox,
                         .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
-                        .layer = HITBOX_LAYER
+                        .layer = HITBOX_LAYER,
+                        .shader = s2d_get_quad_shader()
                     });
         }
     }
 
     static f32 x = 0.0f;
-    clmVec2 textPos = s2d_camera_get_pos();
-    textPos.x -= s2d_screen_dimensions().x / 16;
-    textPos.y += s2d_screen_dimensions().y / 8;
-    // Render text like this. Specify any font in the fonts folder.
+    x += 2 * timeStep;
     s2d_text_render(
-            "zerovelo",            // font family
-            textPos,               // position (world)
-            (clmVec4) {            // text colour
+            "zerovelo",            
+            (clmVec2) { 
+                .x = s2d_get_viewport_dimensions().x * 0.45f,
+                .y = s2d_get_viewport_dimensions().y - 50
+            },
+            (clmVec4) {            
                 fabs(sinf(x)),    
                 fabs(cosf(2 * x)), 
                 fabs(sinf(3*x)), 
                 1.0f 
             },
-            TEXT_LAYER,            // sprite layer
-            "%s",                  // format string
-            "Stoff2D"              // optional format args
+            TEXT_LAYER,
+            "%s", 
+            "Stoff2D"
             );
-    x += 2 * timeStep;
-
-    //// uncomment this to see the bitmap generated for this font.
-    //s2d_text_render_bitmap(
-    //        "zerovelo",
-    //        (clmVec2) { 0.0f, 0.0f },             // position (world)
-    //        (clmVec2) { 256.0f, 256.0f },         // size
-    //        (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f }  // colour
-    //        );
 
     s2d_sprite_renderer_render_sprites();
     s2d_particles_render();
@@ -155,13 +148,16 @@ void system_control(f32 timeStep) {
             velCmp->velocity.x += velCmp->maxSpeed.x;
         }
 
-        f32 bulletSpeed = BULLET_SPEED;
         cmp = s2d_ecs_get_component(eID, CMP_TYPE_POSITION);
         PositionComponent* posCmp = &cmp->position;
+
+        // Lock camera to player.
+        s2d_camera_set_pos(posCmp->position);
+
         clmVec2 bulletPosition = clm_v2_add(posCmp->position,
                 clm_v2_scalar_mul(0.5f, PLAYER_SIZE));
         clmVec2 vel = velCmp->velocity;
-
+        f32 bulletSpeed = BULLET_SPEED;
         static f32 canShoot = 0.0f;
         f32 shootTime = 0.2f;
         canShoot -= timeStep;
@@ -403,7 +399,7 @@ void system_animation(f32 timeStep) {
 void system_fps(f32 timeStep) {
     static i32 frames = 0;
     static i32 displayFrames = 0;
-    static f32 time   = 0.0f;
+    static f32 time = 0.0f;
 
     frames++;
     time += timeStep;
@@ -414,12 +410,10 @@ void system_fps(f32 timeStep) {
         time   = 0.0f;
     }
 
-    clmVec2 pos = s2d_camera_get_pos();
-    pos.x -= s2d_screen_dimensions().x / 2;
-    pos.y += s2d_screen_dimensions().y / 2 - 10;
+    clmVec4 scrRect = s2d_get_screen_rect();
     s2d_text_render(
             "Roboto-Bold",
-            pos,
+            (clmVec2) { 10.0f, 12.0f },
             (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f },
             TEXT_LAYER,
             "fps: %d",

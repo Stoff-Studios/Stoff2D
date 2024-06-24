@@ -25,16 +25,18 @@ typedef struct {
     f32          aspectRatio;
 
     // Renderer
-    u32         vao;
-    u32         vbo;
-    u32         ebo;
-    u32         quadShader;
-    Vertex      vertices[S2D_MAX_VERTICES];
-    Vertex*     currentVertex;
-    u32         indicesCount;
-    u32         verticesCount;
-    u32         lastTexture;
-    u32         whiteTex;
+    u32     vao;
+    u32     vbo;
+    u32     ebo;
+    u32     quadShader;
+    u32     textShader;
+    Vertex  vertices[S2D_MAX_VERTICES];
+    Vertex* currentVertex;
+    u32     indicesCount;
+    u32     verticesCount;
+    u32     lastTexture;
+    u32     lastShader;
+    u32     whiteTex;
 
     // Time
     f64         lastTime;
@@ -63,7 +65,8 @@ void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height);
 // Renderer.
 void renderer_init();
 u32  load_texture(const char* fileName);
-void render_flush();
+void render_flush(u32 shader);
+clmMat4 text_projection();
 
 // Camera.
 void    camera_init();
@@ -203,15 +206,13 @@ f32 s2d_start_frame() {
         s2d_unset_flags(S2D_RUNNING);
     }
 
-    // Update projection and view transforms in the shader.
+    // Update quad shader
     shader_use(engine.quadShader);
-
     // Projection (ortho)
     shader_set_uniform_mat4(
             engine.quadShader,
             "proj",
             camera_projection());
-
     // View (lookat)
     shader_set_uniform_mat4(
             engine.quadShader,
@@ -224,7 +225,7 @@ f32 s2d_start_frame() {
 }
 
 void s2d_end_frame() {
-    render_flush();
+    render_flush(engine.lastShader);
     glfwSwapBuffers(engine.winPtr);
 
     // Log stats.
@@ -235,9 +236,17 @@ void s2d_end_frame() {
     }
 }
 
-void render_flush() {
+u32 s2d_get_quad_shader() {
+    return engine.quadShader;
+}
+
+u32 s2d_get_text_shader() {
+    return engine.textShader;
+}
+
+void render_flush(u32 shader) {
     // Set shader, bind vao, fill vbo.
-    shader_use(engine.quadShader);
+    shader_use(shader);
     glBindTexture(GL_TEXTURE_2D, engine.lastTexture);
     glBindVertexArray(engine.vao);
     glBindVertexArray(engine.vbo);
@@ -264,11 +273,13 @@ void s2d_render_quad(
         clmVec2 size, 
         clmVec4 colour,
         u32     texture,  
-        Frame   frame) {
-    // Flush upon filling up the buffer or texture change.
+        Frame   frame,
+        u32     shader) {
+    // Flush upon filling up the buffer or texture/shader change.
     if (engine.verticesCount == S2D_MAX_VERTICES ||
-            engine.lastTexture != texture) {
-        render_flush();
+            engine.lastTexture != texture ||
+            engine.lastShader != shader) {
+        render_flush(engine.lastShader);
     }
 
     // Bottom-left.
@@ -303,10 +314,11 @@ void s2d_render_quad(
     engine.currentVertex->colour = colour;
     engine.currentVertex++;
 
-    // Increment our counts and update the last added texture.
+    // Increment our counts and update the last added texture and batch type.
     engine.indicesCount  += 6;
     engine.verticesCount += 4;
-    engine.lastTexture = texture;
+    engine.lastTexture    = texture;
+    engine.lastShader     = shader;
 }
 
 void s2d_render_coloured_quad(
@@ -318,7 +330,8 @@ void s2d_render_coloured_quad(
             size,
             colour,
             engine.whiteTex,
-            (Frame) {  0.0f, 0.0f, 1.0f, 1.0f });
+            (Frame) {  0.0f, 0.0f, 1.0f, 1.0f },
+            engine.quadShader);
 }
 
 void s2d_shutdown_engine() {
@@ -380,7 +393,7 @@ void renderer_init() {
             GL_FLOAT,                             // data type of the elements
             GL_FALSE,                             // normalise
             sizeof(Vertex),                       // stride
-            (void*) offsetof(Vertex, colour));  // offset
+            (void*) offsetof(Vertex, colour));    // offset
 
     // ebo
     u32* indices = (u32*) malloc(S2D_MAX_INDICES * sizeof(u32));
@@ -408,12 +421,19 @@ void renderer_init() {
 
     // Load shaders.
     engine.quadShader = shader_create("vQuad.glsl", "fQuad.glsl");
+    engine.textShader = shader_create("vText.glsl", "fQuad.glsl");
+    shader_use(engine.textShader);
+    shader_set_uniform_mat4(
+            engine.textShader,
+            "proj",
+            text_projection());
 
     // Batch renderer stuff.
     engine.currentVertex = engine.vertices;
     engine.verticesCount = 0;
     engine.indicesCount  = 0;
     engine.lastTexture   = 0x80808080; // garbage number.
+    engine.lastShader    = engine.quadShader;
 }
 
 u32 s2d_load_texture(const char* fileName) {
@@ -513,11 +533,20 @@ void s2d_window_windowed() {
             engine.refreshRate);
 }
 
-clmVec2 s2d_screen_dimensions() {
-    return (clmVec2) {
-        .x = engine.winWidth,
-        .y = engine.winHeight
+clmVec4 s2d_get_screen_rect() {
+    clmVec2 camPos = s2d_camera_get_pos();
+    f32 viewWidth  = 2.0f * engine.camZoom * engine.aspectRatio;
+    f32 viewHeight = 2.0f * engine.camZoom;
+    return (clmVec4) {
+        camPos.x - (viewWidth * 0.5f),
+        camPos.y - (viewHeight * 0.5f),
+        viewWidth,
+        viewHeight
     };
+}
+
+clmVec2 s2d_get_viewport_dimensions() {
+    return (clmVec2) { engine.winWidth, engine.winHeight };
 }
 
 /*****************************************************************************/
@@ -530,6 +559,11 @@ void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height) {
     engine.winWidth  = width;
     engine.winHeight = height;
     engine.aspectRatio = ((f32) engine.winWidth) / ((f32) engine.winHeight);
+    shader_use(engine.textShader);
+    shader_set_uniform_mat4(
+            engine.textShader,
+            "proj",
+            text_projection());
 }
 
 /*****************************************************************************/
@@ -594,6 +628,16 @@ clmMat4 camera_projection() {
               100.0f);
 }
 
+clmMat4 text_projection() {
+    return clm_mat4_ortho(
+            0,
+            engine.winWidth,
+            0,
+            engine.winHeight,
+            0.0f,
+            100.0f);
+}
+
 clmMat4 camera_view() {
     return clm_mat4_lookat(
             engine.camPos,
@@ -625,8 +669,8 @@ void s2d_text_render_bitmap(
             size,
             colour,
             font->fontTexID,
-            (Frame) { 0.0f, 0.0f, 1.0f, 1.0f }
-            );
+            (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+            engine.quadShader);
 }
 
 void s2d_text_render(
@@ -668,13 +712,15 @@ void s2d_text_render(
         s2dChar c = font->chars[buffer[i]];
         s2dSprite glyphSprite = (s2dSprite) {
             .position = (clmVec2) { 
-                position.x + c.bearingX, position.y + c.bearingY - c.height 
+                .x = position.x + c.bearingX, 
+                .y = position.y + c.bearingY - c.height 
             },
             .size    = (clmVec2) { c.width, c.height },
             .texture = font->fontTexID,
             .colour  = colour,
             .frame   = c.texRegion,
-            .layer   = layer
+            .layer   = layer,
+            .shader  = engine.textShader
         };
         s2d_sprite_renderer_add_sprite(glyphSprite);
         position.x += c.advance >> 6;
