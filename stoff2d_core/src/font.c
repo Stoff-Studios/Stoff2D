@@ -1,6 +1,5 @@
 #include <font.h>
 #include <defines.h>
-#include <dirent.h> 
 #include <string.h>
 #include <glad/glad.h>
 #include <ft2build.h>
@@ -105,7 +104,8 @@ bool load_font(s2dFont* font, const char* fileName) {
 
     // remove .ttf extension and use the font name as the lookup key.
     i32 nameLength = strlen(fileName);
-    char* fontName = strndup(fileName, nameLength - 4); 
+    char* fontName = strdup(fileName);
+    fontName[nameLength - 4] = '\0'; // can't use strndup on windows!!!
     font->fontName = fontName; // INFO: fontName freed in shutdown
 
     // disable byte-alignment restriction
