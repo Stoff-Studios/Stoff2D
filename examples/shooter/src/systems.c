@@ -413,7 +413,7 @@ void system_fps(f32 timeStep) {
 
     clmVec4 scrRect = s2d_get_screen_rect();
     s2d_text_render(
-            "Roboto-Bold",
+            "BigBlueTerm",
             (clmVec2) { 10.0f, 12.0f },
             (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f },
             0.5f,

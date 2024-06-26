@@ -177,6 +177,17 @@ f32 s2d_start_frame();
  */
 void s2d_end_frame();
 
+/* s2d_set_frame_cap
+ * -----------------
+ * Change the frame cap.
+ *
+ * fps:
+ *     the desired frames per second, or use macros:
+ *     - S2D_FPS_UNCAPPED for uncapped
+ *     - S2D_FPS_VSYNC    to enable vsync (undoes previous framecap)
+ */
+void s2d_set_frame_cap(u32 fps);
+
 /*****************************************************************************/
 
 /********************************** Flags ************************************/

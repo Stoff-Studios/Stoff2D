@@ -68,8 +68,8 @@ void game_init() {
         exit(1);
     }
     s2d_ecs_initialise();
-    s2d_set_flags(S2D_LOG_STATS);
     s2d_clear_colour(CLEAR_COLOUR);
+    s2d_set_frame_cap(S2D_FPS_VSYNC);
 
     entites_set_game_data_ptr(&gData);
     systems_set_game_data_ptr(&gData);

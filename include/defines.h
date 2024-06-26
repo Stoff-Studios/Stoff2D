@@ -5,6 +5,8 @@
 #include <clm/clm.h>
 #include <settings.h>
 
+#define S2D_FPS_UNCAPPED 0xffffffff
+#define S2D_FPS_VSYNC    0xfffffff0
 
 /********************************** Flags ************************************/
 

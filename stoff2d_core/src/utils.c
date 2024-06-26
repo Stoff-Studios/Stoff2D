@@ -7,6 +7,7 @@
 #include <windows.h>
 #else
 #include <dirent.h> 
+#include <unistd.h>
 #endif
 
 #ifdef _WIN32
@@ -66,3 +67,12 @@ char** list_files_in_dir(const char* dirPath) {
 }
 
 #endif
+
+
+void utils_sleep(float seconds) {
+#ifdef _WIN32
+    Sleep(seconds * 1000.0f);
+#else
+    usleep(seconds * 1000000);
+#endif
+}

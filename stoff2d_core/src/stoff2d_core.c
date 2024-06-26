@@ -3,6 +3,7 @@
 #include <stoff2d_core.h>
 #include <shader.h>
 #include <font.h>
+#include <utils.h>
 #include <stbi/stbi_image.h>
 
 #include <stdlib.h>
@@ -41,6 +42,7 @@ typedef struct {
     // Time
     f64         lastTime;
     f32         timeStep;
+    f32         targetFrameTime;
 
     // Camera.
     f32     camZoom;
@@ -109,8 +111,9 @@ bool s2d_initialise_engine(const char* programName) {
     camera_init();
 
     // Time.
-    engine.lastTime = glfwGetTime();
-    engine.timeStep = 0.0f;
+    engine.lastTime        = glfwGetTime();
+    engine.timeStep        = 0.0f;
+    engine.targetFrameTime = 0.0f; // uncapped.
 
     // Debugging.
     engine.logStatsTimer = 0;
@@ -137,7 +140,6 @@ bool s2d_initialise_engine(const char* programName) {
     }
 
     glfwMakeContextCurrent(engine.winPtr);
-    glfwSwapInterval(S2D_VSYNC);
 
     // Initialize OpenGL function pointers with GLAD.
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -188,6 +190,14 @@ f32 s2d_start_frame() {
     engine.timeStep = (f32) (currentTime - engine.lastTime);
     engine.lastTime = currentTime;
 
+    // Limit fps to framecap.
+    if (engine.timeStep < engine.targetFrameTime) {
+        f32 sleepTime = engine.targetFrameTime - engine.timeStep;
+        utils_sleep(sleepTime);
+        engine.timeStep += sleepTime;
+        engine.lastTime += sleepTime;
+    }
+
     if (s2d_check_flags(S2D_PAUSED)) {
         engine.timeStep = 0.0f;
     }
@@ -233,6 +243,21 @@ void s2d_end_frame() {
             engine.logStatsTimer > S2D_LOG_STATS_INTERVAL) {
         log_stats();
         engine.logStatsTimer = 0.0f;
+    }
+}
+
+void s2d_set_frame_cap(u32 fps) {
+    switch (fps) {
+        case S2D_FPS_UNCAPPED:
+            glfwSwapInterval(0);
+            engine.targetFrameTime = 0.0f;
+            break;
+        case S2D_FPS_VSYNC:
+            glfwSwapInterval(1);
+            break;
+        default:
+            glfwSwapInterval(0);
+            engine.targetFrameTime = 1.0f / (f32) fps;
     }
 }
 

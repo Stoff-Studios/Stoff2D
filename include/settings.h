@@ -13,10 +13,6 @@
 #define S2D_MAX_ANIMATION_TABLE_SIZE 1039
 
 
-// Window.
-#define S2D_VSYNC 0 // 0 -> off, 1 -> on
-
-
 // Camera.
 #define S2D_MAX_ZOOM 4000 
 #define S2D_MIN_ZOOM 10

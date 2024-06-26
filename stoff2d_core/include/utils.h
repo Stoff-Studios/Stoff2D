@@ -8,3 +8,12 @@
  * itself.
  */
 char** list_files_in_dir(const char* dirPath);
+
+/* utils_sleep
+ * -----------
+ * Sleep the current thread.
+ *
+ * seconds:
+ *     amound of time in seconds to sleep.
+ */
+void utils_sleep(float seconds);

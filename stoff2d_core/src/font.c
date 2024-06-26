@@ -70,7 +70,7 @@ u32 new_rendertexture_framebuffer() {
             GL_RGBA,
             GL_UNSIGNED_BYTE,
             0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
             GL_LINEAR_MIPMAP_LINEAR);
     glFramebufferTexture(
@@ -85,6 +85,7 @@ u32 new_rendertexture_framebuffer() {
     }
 
     glViewport(0, 0, RENDER_TEX_W, RENDER_TEX_H);
+    // 0 out texture data.
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -119,12 +120,12 @@ bool load_font(s2dFont* font, const char* fileName) {
         return false;
     }
     free(fontPath);
-    FT_Set_Pixel_Sizes(face, 0, 40); // TODO: make this configurable
+    FT_Set_Pixel_Sizes(face, 0, 40);
     
     f32 x    = 0;
     f32 y    = 0;
     u32 rowH = 0; // the max height from all glyphs in each row.
-    u32 padding = 2;
+    const u32 padding = 1;
     for (u8 c = 0; c < 128; c++) {
         // load character glyph 
         if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
@@ -203,7 +204,7 @@ bool load_font(s2dFont* font, const char* fileName) {
         };
 
         // now advance for next glyph
-        x += w; 
+        x += w + padding; 
     }
 
     FT_Done_Face(face);
