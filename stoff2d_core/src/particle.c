@@ -17,14 +17,14 @@ typedef struct {
     clmVec4 currentColour;
 } Particle;
 
-Particle particles[MAX_PARTICLES];
+Particle particles[S2D_MAX_PARTICLES];
 u64      nextIndex = 0;
 u64      aliveCount = 0;
 
 
 void particles_init() {
     srand(12345678);
-    memset(particles, 0, sizeof(Particle) * MAX_PARTICLES);
+    memset(particles, 0, sizeof(Particle) * S2D_MAX_PARTICLES);
 }
 
 // Return a random float in the range [0, 1]
@@ -49,7 +49,7 @@ void s2d_particles_add(ParticleData* pData) {
     };
     for (u32 i = 0; i < pData->count; i++) {
         u64 pIndex = nextIndex++;
-        nextIndex = nextIndex % MAX_PARTICLES;
+        nextIndex = nextIndex % S2D_MAX_PARTICLES;
         Particle* particle = &particles[pIndex];
         if (!particle->active) {
             particle->active = true;
@@ -75,7 +75,7 @@ void s2d_particles_add(ParticleData* pData) {
 
 void s2d_particles_render() {
     u64 renderedCount = 0;
-    for (u64 i = 0; i < MAX_PARTICLES; i++) {
+    for (u64 i = 0; i < S2D_MAX_PARTICLES; i++) {
         Particle p = particles[i];
         if (renderedCount == aliveCount) {
             break;
@@ -93,7 +93,7 @@ void s2d_particles_render() {
 void particles_update(f32 timeStep) {
     u64 updatedCount = 0;
     u64 diedCount = 0;
-    for (u64 i = 0; i < MAX_PARTICLES; i++) {
+    for (u64 i = 0; i < S2D_MAX_PARTICLES; i++) {
         Particle* p = &particles[i];
         if (updatedCount == aliveCount) {
             break;

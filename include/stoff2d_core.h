@@ -307,9 +307,9 @@ void s2d_camera_set_zoom(f32 z);
  * --------------
  * Retrieve a reference to the animation with key: name.
  * Animations are loaded from res/animations/animations.ani
- * Look at README.ani to learn how to add animations in the above file.
+ * Look at README.ani to learn how to add animations.
  */
-Animation* s2d_animations_get(char* name);
+Animation* s2d_animations_get(const char* name);
 
 /*****************************************************************************/
 

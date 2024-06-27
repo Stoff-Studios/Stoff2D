@@ -4,8 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define LINE_BUFFER_SIZE 100
-#define MAX_ENTRIES (S2D_MAX_ANIMATION_TABLE_SIZE / 2)
+#define LINE_BUFFER_SIZE 1024
+#define TABLE_SIZE (S2D_MAX_ANIMATIONS * 2)
 
 typedef struct {
     // Key.
@@ -17,12 +17,12 @@ typedef struct {
     bool empty;
 } HashEntry;
 
-HashEntry animations[S2D_MAX_ANIMATION_TABLE_SIZE];
+HashEntry animations[TABLE_SIZE];
 u64       animationsCount = 0;
 
 
 // djb2 hash.
-u64 hash_str(char* key) {
+u64 hash_str(const char* key) {
     u64 hash = 5381;
     char c;
     while ((c = *key++) != '\0') {
@@ -31,7 +31,7 @@ u64 hash_str(char* key) {
     return hash;
 }
 
-bool is_blank_or_comment(char* line) {
+bool is_blank_or_comment(const char* line) {
     char c;
     while((c = *line++) != '\n') {
         if (c == '#') {
@@ -44,15 +44,15 @@ bool is_blank_or_comment(char* line) {
     return true;
 }
 
-bool is_new_sprite_sheet(char* line) {
+bool is_new_sprite_sheet(const char* line) {
     return !strcmp("SPRITESHEET\n", line);
 }
 
-bool is_start_animation(char* line) {
+bool is_start_animation(const char* line) {
     return line[0] == '{';
 }
 
-bool is_end_animation(char* line) {
+bool is_end_animation(const char* line) {
     return line[0] == '}';
 }
 
@@ -79,7 +79,7 @@ void print_animation(Animation* animation) {
 // print table for debugging.
 void print_table() {
     printf("TABLE START\n");
-    for (u32 i = 0; i < S2D_MAX_ANIMATION_TABLE_SIZE; i++) {
+    for (u32 i = 0; i < TABLE_SIZE; i++) {
         HashEntry* entry = &animations[i];
         printf("%u --- name: %s empty: %d\n",
                 i, entry->name, entry->empty);
@@ -87,25 +87,25 @@ void print_table() {
     printf("TABLE END\n");
 }
 
-void animations_put(char* name, Animation animation) {
+void animations_put(const char* name, Animation animation) {
     // Don't allow load factor to creep over 50%. 
-    if (animationsCount == MAX_ENTRIES) {
+    if (animationsCount == S2D_MAX_ANIMATIONS) {
         fprintf(stderr, 
                 "Exceeded animation limit of %d when trying to add animation:"
                 " %s, increase MAX_ANIMATION_TABLE_SIZE to a higher prime number"
                 " in settings.h if you need more space for animations\n",
-                MAX_ENTRIES, name);
+                S2D_MAX_ANIMATIONS, name);
         return;
     }
 
     u64 hash  = hash_str(name);
-    u64 index = hash % S2D_MAX_ANIMATION_TABLE_SIZE;
+    u64 index = hash % TABLE_SIZE;
     HashEntry* entry = &animations[index];
 
     // Quadratic probe until we find an empty slot.
     u64 probe = 1;
     while(!entry->empty) {
-        index = (hash + (probe * probe)) % S2D_MAX_ANIMATION_TABLE_SIZE;
+        index = (hash + (probe * probe)) % TABLE_SIZE;
         entry = &animations[index];
         probe++;
     }
@@ -121,7 +121,8 @@ void parse_ani_file() {
     FILE* aniFile = fopen(S2D_ANIMATION_FILE, "r");
     if (!aniFile) {
         fprintf(stderr, 
-                "Could not open animation file\n");
+                "[S2D Error] could not open animation file - %s\n",
+                S2D_ANIMATION_FILE);
         return;
     }
 
@@ -159,30 +160,40 @@ void parse_ani_file() {
             Animation animation;
             animation.frameCount = 0;
             while(fgets(line, LINE_BUFFER_SIZE, aniFile)) {
-                if (!is_blank_or_comment(line)) {
-                    if (is_end_animation(line)) {
-                        break;
-                    }
-                    f32 x = atof(strtok(line, ","));
-                    f32 y = atof(strtok(NULL, ","));
-                    Frame frame = (Frame) {
-                        .x = x * spriteW,
-                        .y = y * spriteH,
-                        .w = spriteW,
-                        .h = spriteH
-                    };
-                    animation.frames[animation.frameCount++] = frame;
+                if (is_blank_or_comment(line)) {
+                    continue;
                 }
+                if (is_end_animation(line)) {
+                    break;
+                }
+                if (animation.frameCount == S2D_MAX_ANIMATION_FRAMES) {
+                    fprintf(stderr,
+                            "[S2D Error] tried to load animation longer than "
+                            "limit of %d (dropped frames), "
+                            "increase S2D_MAX_ANIMATION_FRAMES in settings.h\n",
+                            S2D_MAX_ANIMATION_FRAMES);
+                    break;
+                }
+                f32 x = atof(strtok(line, ","));
+                f32 y = atof(strtok(NULL, ","));
+                Frame frame = (Frame) {
+                    .x = x * spriteW,
+                    .y = y * spriteH,
+                    .w = spriteW,
+                    .h = spriteH
+                };
+                animation.frames[animation.frameCount++] = frame;
             }
             animations_put(name, animation);
         }
     }
+
     fclose(aniFile);
 }
 
 void animations_init() {
     // Set each entry to be an empty slot.
-    for (u32 i = 0; i < S2D_MAX_ANIMATION_TABLE_SIZE; i++) {
+    for (u32 i = 0; i < TABLE_SIZE; i++) {
         HashEntry* entry = &animations[i];
         strcpy(entry->name, "NONE");
         memset(&entry->animation, 0, sizeof(Animation));
@@ -191,14 +202,14 @@ void animations_init() {
     parse_ani_file();
 }
 
-Animation* s2d_animations_get(char* name) {
+Animation* s2d_animations_get(const char* name) {
     // Quadratic probe until we find the animation.
     HashEntry* entry;
     u64 index;
     u64 hash       = hash_str(name);
     u64 probe      = 0;
     while(true) {
-        index = (hash + (probe * probe)) % S2D_MAX_ANIMATION_TABLE_SIZE;
+        index = (hash + (probe * probe)) % TABLE_SIZE;
         entry = &animations[index];
 
         // Ran into empty slot, stop the search. Don't have to worry about

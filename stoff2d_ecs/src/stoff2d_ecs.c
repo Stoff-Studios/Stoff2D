@@ -61,7 +61,7 @@ s2dComponentMap componentBuckets[CMP_TYPE_COUNT];
 u64 componentMasks[CMP_TYPE_COUNT];
 
 // Each eID is it's bitflag which indicates which components it has.
-u64 componentFlags[MAX_ENTITIES];
+u64 componentFlags[S2D_MAX_ENTITIES];
 
 // Stack of eIDs that are reused in ecs_create_entity. 
 // First eID is 1 since 0 is reserved as an error/empty eID.
@@ -81,9 +81,9 @@ u32 s2d_ecs_create_entity() {
     u32 eID = NO_ENTITY;
     if (cds_exlist_len(recycledIDs)) {
         eID = *((u32*) cds_exlist_pop(recycledIDs));
-    } else if (nextID == MAX_ENTITIES) {
+    } else if (nextID == S2D_MAX_ENTITIES) {
         fprintf(stderr,
-                "Exceeded MAX_ENTITIES, consider increasing in settings.h\n");
+                "Exceeded S2D_MAX_ENTITIES, consider increasing in settings.h\n");
     } else {
         eID = nextID++;
     }
@@ -142,7 +142,7 @@ bool s2d_ecs_entity_has(u32 eID, ComponentType type) {
 void s2d_ecs_print_components() {
     for (ComponentType type = 0; type < CMP_TYPE_COUNT; type++) {
         s2dComponentMap* components = &componentBuckets[type];
-        printf("\nCOMPONENTS: %s (size - %llu tableSize - %llu)\n",
+        printf("\nCOMPONENTS: %s (size - %lu tableSize - %lu)\n",
                 componentStrings[type], 
                 component_map_size(components),
                 s2d_component_map_tablesize(components));
