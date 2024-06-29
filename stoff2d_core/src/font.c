@@ -49,52 +49,13 @@ void setup_gl_for_render_to_texture() {
         proj);
 }
 
-// returns the texture that will be rendered to.
-u32 new_rendertexture_framebuffer() {
-    // framebuffer.
-    u32 frameBuffer = 0;
-    glGenFramebuffers(1, &frameBuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer);
 
-    // render texture.
-    u32 renderedTexture;
-    glGenTextures(1, &renderedTexture);
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-    glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RGBA,
-            RENDER_TEX_W,
-            RENDER_TEX_H,
-            0,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
-            0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-            GL_LINEAR_MIPMAP_LINEAR);
-    glFramebufferTexture(
-            GL_FRAMEBUFFER,
-            GL_COLOR_ATTACHMENT0,
-            renderedTexture,
-            0);
-    GLenum drawBuffers[1] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, drawBuffers);
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        fprintf(stderr, "[S2D Error] failed to create font render texture\n");
-    }
-
-    glViewport(0, 0, RENDER_TEX_W, RENDER_TEX_H);
-    // 0 out texture data.
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    return renderedTexture;
-}
 
 bool load_font(s2dFont* font, const char* fileName) {
     // create new framebuffer to render to
-    u32 renderTexture = new_rendertexture_framebuffer();
+    u32 renderTexture = new_rendertexture_framebuffer(
+            RENDER_TEX_W,
+            RENDER_TEX_H);
 
     // construct path with file name and fonts folder.
     const char* fontsDir = S2D_FONTS_FOLDER;

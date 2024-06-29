@@ -1,10 +1,11 @@
 #pragma once
 
 // Resource locations.
-#define S2D_TEXTURE_FOLDER "res/textures/"
-#define S2D_SHADER_FOLDER  "res/shaders/"
-#define S2D_FONTS_FOLDER   "res/fonts/"
-#define S2D_ANIMATION_FILE "res/animations/animations.ani"
+#define S2D_TEXTURE_FOLDER          "res/textures/"
+#define S2D_PARTICLE_SPRITES_FOLDER "res/textures/particles/"
+#define S2D_SHADER_FOLDER           "res/shaders/"
+#define S2D_FONTS_FOLDER            "res/fonts/"
+#define S2D_ANIMATION_FILE          "res/animations/animations.ani"
 
 // Animation.
 #define S2D_MAX_ANIMATION_NAME_LEN   32   // character limit

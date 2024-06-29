@@ -153,8 +153,8 @@ bool s2d_initialise_engine(const char* programName) {
         return false;
     }
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glViewport(0, 0, engine.winWidth, engine.winHeight);
+    // Load white texture for coloured quads.
+    engine.whiteTex = s2d_load_texture("white.png");
 
     // Set Callbacks.
     glfwSetFramebufferSizeCallback(engine.winPtr, framebuffer_size_callback);
@@ -171,9 +171,9 @@ bool s2d_initialise_engine(const char* programName) {
     // Initialise particle system.
     particles_init();
 
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glViewport(0, 0, engine.winWidth, engine.winHeight);
 
-    // Load white texture for coloured quads.
-    engine.whiteTex = s2d_load_texture("white.png");
 
     // All is well so start the application.
     engine.flags = S2D_RUNNING;

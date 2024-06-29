@@ -1,8 +1,14 @@
 #include <stoff2d_core.h>
+#include <utils.h>
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stbi/stbi_image.h>
+
+#define RENDER_TEX_W 1024
+#define RENDER_TEX_H 1024
 
 typedef struct {
     bool    active;
@@ -15,16 +21,73 @@ typedef struct {
     clmVec4 birthColour;
     clmVec4 colourChange;
     clmVec4 currentColour;
+    char    spriteName[32]; 
 } Particle;
+
+typedef struct {
+    char* spriteName;
+    u32   texture;
+} ParticleSprite;
 
 Particle particles[S2D_MAX_PARTICLES];
 u64      nextIndex = 0;
 u64      aliveCount = 0;
 
+// look up particle sprite by name in here for texture subregion.
+ParticleSprite* particleSprites;
+u32             particleSpritesCount = 0;
+
+
+u32 lookup_particle_texture(const char* spriteName) {
+    ParticleSprite* p = particleSprites;
+    for (u32 i = 0; i < particleSpritesCount; i++) {
+        if (!strcmp(p->spriteName, spriteName)){
+            return p->texture;
+        }
+        p++;
+    }
+    fprintf(stderr,
+            "[S2D Error] could not find particle texture with name %s\n",
+            spriteName);
+    return 0;
+}
 
 void particles_init() {
     srand(12345678);
     memset(particles, 0, sizeof(Particle) * S2D_MAX_PARTICLES);
+
+
+    char** files    = list_files_in_dir(S2D_PARTICLE_SPRITES_FOLDER);
+    char** filesCpy = files; // NOTE: for freeing
+    char*  fileName;         // NOTE: freed in shutdown
+    while ((fileName = *files++)) {
+        // filter out current and previous directory listing.
+        if (!strcmp(".", fileName) || !strcmp("..", fileName)) {
+            free(fileName);
+            continue;
+        } 
+
+        // Construct path for texture.
+        const char* textureDir = "particles/";
+        size_t texPathLen = strlen(textureDir) + strlen(fileName);
+        char* texPath = (char*) malloc((texPathLen * sizeof(char)) + 1);
+        strcpy(texPath, textureDir);
+        strcat(texPath, fileName);
+
+        // load it.
+        u32 texture = s2d_load_texture(texPath);
+        free(texPath);
+
+        // strip off .png extension and save that as key in lookup array.
+        particleSprites = realloc(
+                particleSprites, 
+                sizeof(ParticleSprite) * ++particleSpritesCount);
+        fileName[strlen(fileName) - 4] = '\0';
+        particleSprites[particleSpritesCount - 1].spriteName = fileName;
+        particleSprites[particleSpritesCount - 1].texture = texture;
+    }
+
+    free(filesCpy);
 }
 
 // Return a random float in the range [0, 1]
@@ -55,11 +118,11 @@ void s2d_particles_add(ParticleData* pData) {
             particle->active = true;
             aliveCount++;
         }
-        particle->birthTime = glfwGetTime();
+        particle->birthTime       = glfwGetTime();
         particle->currentDuration = 0.0f;
-        particle->lifeTime = pData->lifeTime;
-        particle->position = pData->position;
-        particle->velocity = (clmVec2) {
+        particle->lifeTime        = pData->lifeTime;
+        particle->position        = pData->position;
+        particle->velocity        = (clmVec2) {
             pData->lowerVelocity.x + (velVariation.x * randf()),
             pData->lowerVelocity.y + (velVariation.y * randf())
         };
@@ -67,9 +130,10 @@ void s2d_particles_add(ParticleData* pData) {
             pData->lowerSize.x + (sizeVariation.x * randf()),
             pData->lowerSize.y + (sizeVariation.y * randf())
         };
-        particle->birthColour = pData->birthColour;
+        particle->birthColour   = pData->birthColour;
         particle->currentColour = pData->birthColour;
-        particle->colourChange = colourChange;
+        particle->colourChange  = colourChange;
+        strncpy(particle->spriteName, pData->spriteName, 32);
     }
 }
 
@@ -81,10 +145,14 @@ void s2d_particles_render() {
             break;
         }
         if (p.active) {
-            s2d_render_coloured_quad(
+            s2d_render_quad(
                     p.position,
                     p.size,
-                    p.currentColour);
+                    p.currentColour,
+                    lookup_particle_texture(p.spriteName),
+                    S2D_ENTIRE_TEXTURE,
+                    s2d_get_quad_shader()
+                    );
             renderedCount++;
         }
     }
@@ -122,3 +190,13 @@ void particles_update(f32 timeStep) {
     }
     aliveCount -= diedCount;
 }
+
+void particles_shutdown() {
+    ParticleSprite* p = particleSprites;
+    for (u32 i = 0; i < particleSpritesCount; i++) {
+        free(p->spriteName);
+        p++;
+    }
+    free(particleSprites);
+}
+

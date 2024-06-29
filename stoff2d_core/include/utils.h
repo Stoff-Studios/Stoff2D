@@ -1,5 +1,7 @@
 #pragma once
 
+#include <defines.h>
+
 /* list_files_in_dir
  * -----------------
  * Returns an array of all the filenames in a directory terminated by NULL.
@@ -16,4 +18,10 @@ char** list_files_in_dir(const char* dirPath);
  * seconds:
  *     amound of time in seconds to sleep.
  */
-void utils_sleep(float seconds);
+void utils_sleep(f32 seconds);
+
+/* new_rendertexture_framebuffer
+ * -----------------------------
+ * Generate a new framebuffer to render to.
+ */
+u32 new_rendertexture_framebuffer(u32 w, u32 h);

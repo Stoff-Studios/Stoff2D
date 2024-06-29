@@ -17,6 +17,13 @@
 /*****************************************************************************/
 
 
+/*********************************** Misc ************************************/
+
+#define S2D_ENTIRE_TEXTURE ((Frame) { 0.0f, 0.0f, 1.0f, 1.0f })
+
+/*****************************************************************************/
+
+
 /********************************* Keycodes **********************************/
 
 // A-Z
@@ -128,20 +135,16 @@ typedef struct {
 /******************************** Particles **********************************/
 
 typedef struct {
-    u32     count;         // number of particles to spawn.
-    f32     lifeTime;      // lifetime of each particle in seconds.
+    u32     count;           // number of particles to spawn.
+    f32     lifeTime;        // lifetime of each particle in seconds.
     clmVec2 position;
-    clmVec2 lowerVelocity; // lower velocity bound.
-    clmVec2 upperVelocity; // upper velocity bound.
-    clmVec2 lowerSize;     // lower size bound.
-    clmVec2 upperSize;     // upper size bound.
-    clmVec4 birthColour;   // start colour.
-    clmVec4 deathColour;   // end colour.
+    clmVec2 lowerVelocity;   // lower velocity bound.
+    clmVec2 upperVelocity;   // upper velocity bound.
+    clmVec2 lowerSize;       // lower size bound.
+    clmVec2 upperSize;       // upper size bound.
+    clmVec4 birthColour;     // start colour.
+    clmVec4 deathColour;     // end colour.
+    char    spriteName[32];  // name of a sprite in S2D_PARTICLE_SPRITES_FOLDER
 } ParticleData;
-
-/*****************************************************************************/
-
-/***************************** Font and Text *********************************/
-
 
 /*****************************************************************************/
