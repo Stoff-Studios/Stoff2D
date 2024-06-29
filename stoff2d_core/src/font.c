@@ -30,10 +30,10 @@ void setup_gl_for_render_to_texture() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    shader = shader_create(
+    shader = s2d_shader_create(
             "vRendToFont.glsl",
             "fRendToFont.glsl");
-    shader_use(shader);
+    s2d_shader_use(shader);
     glUniform3f(glGetUniformLocation(shader, "textColor"), 1.0, 1.0, 1.0);
     glActiveTexture(GL_TEXTURE0);
     clmMat4 proj = clm_mat4_ortho(
@@ -43,7 +43,7 @@ void setup_gl_for_render_to_texture() {
         RENDER_TEX_H,
         0.0f,
         1.0f);
-    shader_set_uniform_mat4(
+    s2d_shader_set_uniform_mat4(
         shader,
         "projection",
         proj);

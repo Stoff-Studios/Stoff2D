@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stoff2d_core.h>
-#include <shader.h>
 #include <font.h>
 #include <utils.h>
 #include <stbi/stbi_image.h>
@@ -71,9 +70,7 @@ void render_flush(u32 shader);
 clmMat4 text_projection();
 
 // Camera.
-void    camera_init();
-clmMat4 camera_view();
-clmMat4 camera_projection();
+void camera_init();
 
 // Animation.
 void animations_init();
@@ -217,17 +214,17 @@ f32 s2d_start_frame() {
     }
 
     // Update quad shader
-    shader_use(engine.quadShader);
+    s2d_shader_use(engine.quadShader);
     // Projection (ortho)
-    shader_set_uniform_mat4(
+    s2d_shader_set_uniform_mat4(
             engine.quadShader,
             "proj",
-            camera_projection());
+            s2d_camera_projection());
     // View (lookat)
-    shader_set_uniform_mat4(
+    s2d_shader_set_uniform_mat4(
             engine.quadShader,
             "view",
-            camera_view());
+            s2d_camera_view());
 
     particles_update(engine.timeStep);
 
@@ -271,7 +268,8 @@ u32 s2d_get_text_shader() {
 
 void render_flush(u32 shader) {
     // Set shader, bind vao, fill vbo.
-    shader_use(shader);
+    s2d_shader_use(shader);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, engine.lastTexture);
     glBindVertexArray(engine.vao);
     glBindVertexArray(engine.vbo);
@@ -357,6 +355,16 @@ void s2d_render_coloured_quad(
             engine.whiteTex,
             (Frame) {  0.0f, 0.0f, 1.0f, 1.0f },
             engine.quadShader);
+}
+
+void s2d_set_texture_slot(
+        u32 shader,
+        const char* uniformName, 
+        u32 slot, 
+        u32 texture) {
+    s2d_shader_set_uniform_1i(shader, uniformName, slot);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texture);
 }
 
 void s2d_shutdown_engine() {
@@ -445,10 +453,10 @@ void renderer_init() {
     glBindVertexArray(0);
 
     // Load shaders.
-    engine.quadShader = shader_create("vQuad.glsl", "fQuad.glsl");
-    engine.textShader = shader_create("vText.glsl", "fQuad.glsl");
-    shader_use(engine.textShader);
-    shader_set_uniform_mat4(
+    engine.quadShader = s2d_shader_create("vQuad.glsl", "fQuad.glsl");
+    engine.textShader = s2d_shader_create("vText.glsl", "fQuad.glsl");
+    s2d_shader_use(engine.textShader);
+    s2d_shader_set_uniform_mat4(
             engine.textShader,
             "proj",
             text_projection());
@@ -584,8 +592,8 @@ void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height) {
     engine.winWidth  = width;
     engine.winHeight = height;
     engine.aspectRatio = ((f32) engine.winWidth) / ((f32) engine.winHeight);
-    shader_use(engine.textShader);
-    shader_set_uniform_mat4(
+    s2d_shader_use(engine.textShader);
+    s2d_shader_set_uniform_mat4(
             engine.textShader,
             "proj",
             text_projection());
@@ -643,7 +651,7 @@ void camera_init() {
     engine.camUp   = S2D_CAM_UP;
 }
 
-clmMat4 camera_projection() {
+clmMat4 s2d_camera_projection() {
     return clm_mat4_ortho(
              -engine.camZoom * engine.aspectRatio,
               engine.camZoom * engine.aspectRatio,
@@ -663,7 +671,7 @@ clmMat4 text_projection() {
             100.0f);
 }
 
-clmMat4 camera_view() {
+clmMat4 s2d_camera_view() {
     return clm_mat4_lookat(
             engine.camPos,
             (clmVec3) { engine.camPos.x, engine.camPos.y, -1.0f },

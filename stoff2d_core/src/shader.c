@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define SHADER_FOLDER S2D_SHADER_FOLDER
+
 // Helper method which reads a text file into a string.
 char* read_shader_file(const char* filePath) {
     // Open the homie.
@@ -38,7 +40,7 @@ char* read_shader_file(const char* filePath) {
     return src;
 }
 
-unsigned int shader_create(
+unsigned int s2d_shader_create(
         const char* vShaderPath,
         const char* fShaderPath) {
     // Shader directory path.
@@ -88,34 +90,44 @@ unsigned int shader_create(
     return shader;
 }
 
-void shader_use(unsigned int shader) {
+void s2d_shader_use(unsigned int shader) {
     glUseProgram(shader);
 }
 
-void shader_set_uniform_mat4(
+void s2d_shader_set_uniform_mat4(
         unsigned int shader,
         const char* uniformName,
         clmMat4 mat) {
-    shader_use(shader);
+    s2d_shader_use(shader);
     unsigned int loc = glGetUniformLocation(shader, uniformName);
     glUniformMatrix4fv(loc, 1, GL_FALSE, mat.mat);
 }
 
-void shader_set_uniform_vec3(
+void s2d_shader_set_uniform_vec3(
         unsigned int shader,
         const char* uniformName,
         clmVec3 vec) {
-    shader_use(shader);
+    s2d_shader_use(shader);
     unsigned int loc = glGetUniformLocation(shader, uniformName);
     glUniform3fv(loc, 1, &vec.x);
 }
 
-void shader_set_uniform_1i(
+void s2d_shader_set_uniform_1i(
         unsigned int shader,
         const char* uniformName,
         i32 i) {
-    shader_use(shader);
+    s2d_shader_use(shader);
     unsigned int loc = glGetUniformLocation(shader, uniformName);
     glUniform1i(loc, i);
 }
+
+void s2d_shader_set_uniform_1f(
+        unsigned int shader,
+        const char* uniformName,
+        float f) {
+    s2d_shader_use(shader);
+    unsigned int loc = glGetUniformLocation(shader, uniformName);
+    glUniform1f(loc, f);
+}
+
 

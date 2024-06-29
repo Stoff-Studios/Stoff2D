@@ -8,6 +8,7 @@
 #include <defines.h>         // Types, keycodes and flags.
 #include <settings.h>        // Settings.
 #include <clm/clm.h>         // Linear algebra.
+#include <shader.h>          // Shader loading/usage.
 
 #ifdef __cplusplus
 extern "C" {
@@ -160,6 +161,16 @@ void s2d_text_render_bitmap(
         clmVec2     size,
         clmVec4     colour);
 
+/* s2d_set_texture_slot
+ * --------------------
+ * Set the corresponding texture slot to texture.
+ */
+void s2d_set_texture_slot(
+        u32 shader,
+        const char* uniformName,
+        u32 slot,
+        u32 texture);
+
 /*****************************************************************************/
 
 
@@ -297,6 +308,20 @@ void s2d_camera_zoom(f32 dz);
  * Set the zoom level to z.
  */
 void s2d_camera_set_zoom(f32 z);
+
+/* s2d_camera_view
+ * ---------------
+ * get the current view transform for the camera. Usefull for updating custom
+ * shaders.
+ */
+clmMat4 s2d_camera_view();
+
+/* s2d_camera_projection
+ * ---------------------
+ * get the current projection transform for the camera. Usefull for updating 
+ * custom shaders.
+ */
+clmMat4 s2d_camera_projection();
 
 /*****************************************************************************/
 
