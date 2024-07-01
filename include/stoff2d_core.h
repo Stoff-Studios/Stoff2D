@@ -120,6 +120,8 @@ void s2d_clear_colour(clmVec4 colour);
 /* s2d_text_render
  * ---------------
  * Render text to the screen.
+ * NOTE: s2d_sprite_renderer_render_sprites must be called for any text
+ * to show since this uses the sprite renderer.
  *
  * fontName: 
  *     name of a font in the fonts folder, not including .ttf extension
