@@ -9,6 +9,10 @@
 
 #pragma once
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct {
     float x;
     float y;
@@ -202,3 +206,7 @@ void clm_v3_print(clmVec3 v);
  * print v to 4 decimals points accuracy
  */
 void clm_v4_print(clmVec4 v);
+
+#ifdef __cplusplus
+}
+#endif
