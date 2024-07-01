@@ -4,6 +4,10 @@
 #include <settings.h>
 #include <defines.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* s2d_shader_create
  * -----------------
  * Returns id handle of shader program.
@@ -55,4 +59,6 @@ void s2d_shader_set_uniform_1f(
         const char* uniformName,
         float f);
 
-
+#ifdef __cplusplus
+}
+#endif
