@@ -5,6 +5,7 @@
 #include <ft2build.h>
 #include <shader.h>
 #include <utils.h>
+#include <rendertexture.h>
 #include FT_FREETYPE_H
 
 #define RENDER_TEX_W 1024
@@ -52,10 +53,13 @@ void setup_gl_for_render_to_texture() {
 
 
 bool load_font(s2dFont* font, const char* fileName) {
-    // create new framebuffer to render to
-    u32 renderTexture = new_rendertexture_framebuffer(
+    // create new texture to render to
+    u32 renderTexture = s2d_rendertexture_create(
             RENDER_TEX_W,
-            RENDER_TEX_H);
+            RENDER_TEX_H,
+            4,
+            false);
+    s2d_rendertexture_set_target(renderTexture, RENDER_TEX_W, RENDER_TEX_H);
 
     // construct path with file name and fonts folder.
     const char* fontsDir = S2D_FONTS_FOLDER;

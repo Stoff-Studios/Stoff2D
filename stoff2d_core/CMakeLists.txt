@@ -7,7 +7,8 @@ add_library(stoff2d_core
     src/stbi_image.c
     src/stoff2d_core.c
     src/font.c
-    src/utils.c)
+    src/utils.c
+    src/rendertexture.c)
 
 target_include_directories(stoff2d_core PRIVATE 
     "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/glad"

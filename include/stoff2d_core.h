@@ -9,6 +9,7 @@
 #include <settings.h>        // Settings.
 #include <clm/clm.h>         // Linear algebra.
 #include <shader.h>          // Shader loading/usage.
+#include <rendertexture.h>   // render buffer helpers.
 
 #ifdef __cplusplus
 extern "C" {

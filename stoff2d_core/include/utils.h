@@ -20,8 +20,3 @@ char** list_files_in_dir(const char* dirPath);
  */
 void utils_sleep(f32 seconds);
 
-/* new_rendertexture_framebuffer
- * -----------------------------
- * Generate a new framebuffer to render to.
- */
-u32 new_rendertexture_framebuffer(u32 w, u32 h);
