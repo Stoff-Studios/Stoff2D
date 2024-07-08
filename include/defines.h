@@ -99,6 +99,19 @@ typedef struct {
     clmVec4 colour;
 } Vertex;
 
+typedef struct {
+    u32 frameBufferID;
+    u32 textureID;
+    u32 width;
+    u32 height;
+} RenderTexture;
+
+typedef enum {
+    BLEND_MODE_RENDER_TO_TEXTURE,
+    BLEND_MODE_RENDER_TEXTURE_TO_SCREEN,
+    BLEND_MODE_RENDER_TO_SCREEN
+} s2dBlendMode;
+
 /*****************************************************************************/
 
 
@@ -145,6 +158,7 @@ typedef struct {
     clmVec4 birthColour;     // start colour.
     clmVec4 deathColour;     // end colour.
     char    spriteName[32];  // name of a sprite in S2D_PARTICLE_SPRITES_FOLDER
+    u32     shader;
 } ParticleData;
 
 /*****************************************************************************/

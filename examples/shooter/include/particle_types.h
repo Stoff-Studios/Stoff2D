@@ -1,6 +1,6 @@
 #pragma once
 
-#include <defines.h>
+#include <game.h>
 
 typedef enum {
     PARTICLE_TYPE_BULLET,
@@ -8,6 +8,8 @@ typedef enum {
     PARTICLE_TYPE_BIG_BLOOD,
     PARTICLE_TYPE_COUNT
 } ParticleType;
+
+void particles_set_game_data_ptr(GameData* gData);
 
 ParticleData* particle_type_data(ParticleType type);
 

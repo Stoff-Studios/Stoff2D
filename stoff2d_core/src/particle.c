@@ -22,6 +22,7 @@ typedef struct {
     clmVec4 colourChange;
     clmVec4 currentColour;
     char    spriteName[32]; 
+    u32     shader;
 } Particle;
 
 typedef struct {
@@ -55,7 +56,6 @@ u32 lookup_particle_texture(const char* spriteName) {
 void particles_init() {
     srand(12345678);
     memset(particles, 0, sizeof(Particle) * S2D_MAX_PARTICLES);
-
 
     char** files    = list_files_in_dir(S2D_PARTICLE_SPRITES_FOLDER);
     char** filesCpy = files; // NOTE: for freeing
@@ -98,26 +98,29 @@ f32 randf() {
 void s2d_particles_add(ParticleData* pData) {
     clmVec2 velVariation = clm_v2_add(
             pData->upperVelocity, 
-            clm_v2_scalar_mul(-1, pData->lowerVelocity)
-            );
+            clm_v2_scalar_mul(-1, pData->lowerVelocity));
+
     clmVec2 sizeVariation = clm_v2_add(
             pData->upperSize, 
-            clm_v2_scalar_mul(-1, pData->lowerSize)
-            );
+            clm_v2_scalar_mul(-1, pData->lowerSize));
+
     clmVec4 colourChange = (clmVec4) {
         .r = pData->deathColour.r - pData->birthColour.r,
         .g = pData->deathColour.g - pData->birthColour.g,
         .b = pData->deathColour.b - pData->birthColour.b,
         .a = pData->deathColour.a - pData->birthColour.a
     };
+
     for (u32 i = 0; i < pData->count; i++) {
         u64 pIndex = nextIndex++;
-        nextIndex = nextIndex % S2D_MAX_PARTICLES;
+        nextIndex  = nextIndex % S2D_MAX_PARTICLES;
+
         Particle* particle = &particles[pIndex];
         if (!particle->active) {
             particle->active = true;
             aliveCount++;
         }
+
         particle->birthTime       = glfwGetTime();
         particle->currentDuration = 0.0f;
         particle->lifeTime        = pData->lifeTime;
@@ -134,6 +137,7 @@ void s2d_particles_add(ParticleData* pData) {
         particle->currentColour = pData->birthColour;
         particle->colourChange  = colourChange;
         strncpy(particle->spriteName, pData->spriteName, 32);
+        particle->shader = pData->shader;
     }
 }
 
@@ -141,26 +145,27 @@ void s2d_particles_render() {
     u64 renderedCount = 0;
     for (u64 i = 0; i < S2D_MAX_PARTICLES; i++) {
         Particle p = particles[i];
+
         if (renderedCount == aliveCount) {
             break;
         }
+
         if (p.active) {
+            renderedCount++;
             s2d_render_quad(
                     p.position,
                     p.size,
                     p.currentColour,
                     lookup_particle_texture(p.spriteName),
                     S2D_ENTIRE_TEXTURE,
-                    s2d_get_quad_shader()
-                    );
-            renderedCount++;
+                    p.shader);
         }
     }
 }
 
 void particles_update(f32 timeStep) {
     u64 updatedCount = 0;
-    u64 diedCount = 0;
+    u64 diedCount    = 0;
     for (u64 i = 0; i < S2D_MAX_PARTICLES; i++) {
         Particle* p = &particles[i];
         if (updatedCount == aliveCount) {

@@ -367,6 +367,10 @@ void s2d_set_texture_slot(
     glBindTexture(GL_TEXTURE_2D, texture);
 }
 
+void s2d_render_flush() {
+    render_flush(engine.lastShader);
+}
+
 void s2d_shutdown_engine() {
     glfwDestroyWindow(engine.winPtr);
     sprite_renderer_shutdown();
@@ -522,6 +526,10 @@ void s2d_clear_colour(clmVec4 colour) {
     glClearColor(colour.r, colour.g, colour.b, colour.a);
 }
 
+void s2d_clear() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 /********************************* Window ************************************/
 
 bool s2d_keydown(u32 key) {
@@ -580,6 +588,30 @@ clmVec4 s2d_get_screen_rect() {
 
 clmVec2 s2d_get_viewport_dimensions() {
     return (clmVec2) { engine.winWidth, engine.winHeight };
+}
+
+clmVec2 s2d_get_screen_dimensions() {
+    return (clmVec2) { engine.scrWidth, engine.scrHeight };
+}
+
+void s2d_rendertexture_set_target_screen() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, engine.winWidth, engine.winHeight);
+}
+
+void s2d_set_blend_mode(s2dBlendMode blendMode) {
+    switch (blendMode) {
+        case BLEND_MODE_RENDER_TO_SCREEN:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            break;
+        case BLEND_MODE_RENDER_TEXTURE_TO_SCREEN:
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        case BLEND_MODE_RENDER_TO_TEXTURE:
+            glBlendFuncSeparate(
+                    GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 
+                    GL_ONE_MINUS_DST_ALPHA, GL_ONE);
+            break;
+    }
 }
 
 /*****************************************************************************/

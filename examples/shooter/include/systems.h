@@ -6,7 +6,7 @@ void systems_set_game_data_ptr(GameData* gData);
 
 void system_render(f32 timeStep);
 void system_move(f32 timeStep);
-void system_control();
+void system_control(f32 timeStep);
 void system_death_timer(f32 timeStep);
 void system_particles(f32 timeStep);
 void system_enemy(f32 timeStep);

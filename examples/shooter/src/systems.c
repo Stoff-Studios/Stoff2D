@@ -33,6 +33,12 @@ bool hitboxes_collided(HitBoxComponent a, HitBoxComponent b) {
 }
 
 void system_render(f32 timeStep) {
+    // render to the canvas.
+    s2d_set_blend_mode(BLEND_MODE_RENDER_TO_TEXTURE);
+    s2d_rendertexture_set_target(gData->canvas);
+    s2d_clear_colour(CLEAR_COLOUR);
+    s2d_clear();
+
     s2dComponentMap* spriteCmps = s2d_ecs_get_bucket(CMP_TYPE_SPRITE);
     for (u64 i = 0; i < s2d_component_map_tablesize(spriteCmps); i++) {
         Component* spriteCmp = s2d_component_map_at(spriteCmps, i);
@@ -40,6 +46,7 @@ void system_render(f32 timeStep) {
         if (eID == NO_ENTITY || !s2d_ecs_entity_has(eID, CMP_TYPE_POSITION)) {
             continue;
         }
+
         Component* posCmp = s2d_ecs_get_component(eID, CMP_TYPE_POSITION);
         clmVec4 colour = spriteCmp->sprite.colour;
         // visual indicator of invinsibility.
@@ -47,13 +54,14 @@ void system_render(f32 timeStep) {
             Component* hpCmp = s2d_ecs_get_component(eID, CMP_TYPE_HEALTH);
             if (hpCmp->health.invinsibilityTimer > 0.0f) {
                 colour = (clmVec4) { 
-                    colour.r * 5.0f, 
-                    colour.g * 5.0f,
-                    colour.b * 5.0f,
+                    colour.r * 3.0f, 
+                    colour.g * 3.0f,
+                    colour.b * 3.0f,
                     colour.a
                 };
             }
         }
+
         s2d_sprite_renderer_add_sprite(
                 (s2dSprite) { 
                     .position = posCmp->position.position,
@@ -62,9 +70,8 @@ void system_render(f32 timeStep) {
                     .texture = spriteCmp->sprite.texture,
                     .frame = spriteCmp->sprite.frame,
                     .layer = spriteCmp->sprite.layer,
-                    .shader = s2d_get_quad_shader()
-                    }
-                );
+                    .shader = gData->canvasShader
+                });
     }
 
     if (gData->renderHitboxes) {
@@ -82,17 +89,39 @@ void system_render(f32 timeStep) {
                         .texture = gData->texHitBox,
                         .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
                         .layer = HITBOX_LAYER,
-                        .shader = s2d_get_quad_shader()
+                        .shader = gData->canvasShader
                     });
         }
     }
 
+    // flush all rendering to the canvas
+    s2d_sprite_renderer_render_sprites();
+    s2d_particles_render();
+    s2d_render_flush();
+
+    // switch target to the screen and draw our canvas to it.
+    s2d_set_blend_mode(BLEND_MODE_RENDER_TEXTURE_TO_SCREEN);
+    s2d_rendertexture_set_target_screen();
+    s2d_clear_colour((clmVec4) { 0.0f, 0.0f, 0.0f, 0.0f });
+    s2d_clear();
+    s2d_render_quad(
+            clm_v2_scalar_mul(0.125f, s2d_get_viewport_dimensions()),
+            clm_v2_scalar_mul(0.75f, s2d_get_viewport_dimensions()),
+            (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0 },
+            gData->canvas.textureID,
+            S2D_ENTIRE_TEXTURE,
+            gData->screenShader);
+    s2d_render_flush();
+
+    s2d_set_blend_mode(BLEND_MODE_RENDER_TO_SCREEN);
+
+    // render top banner
     static f32 x = 0.0f;
     x += 2 * timeStep;
     s2d_text_render(
             "zerovelo",            
             (clmVec2) { 
-                .x = s2d_get_viewport_dimensions().x * 0.38f,
+                .x = 20.0f,
                 .y = s2d_get_viewport_dimensions().y - 100
             },
             (clmVec4) {            
@@ -107,8 +136,32 @@ void system_render(f32 timeStep) {
             "Stoff2D"
             );
 
+    // render fps
+    static i32 frames = 0;
+    static i32 displayFrames = 0;
+    static f32 time = 0.0f;
+
+    frames++;
+    time += timeStep;
+
+    if (time >= 0.25f) {
+        displayFrames = frames;
+        frames = 0;
+        time   = 0.0f;
+    }
+
+    clmVec4 scrRect = s2d_get_screen_rect();
+    s2d_text_render(
+            "BigBlueTerm",
+            (clmVec2) { 10.0f, 12.0f },
+            (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
+            0.5f,
+            TEXT_LAYER,
+            "fps: %d",
+            4 * displayFrames
+            );
+
     s2d_sprite_renderer_render_sprites();
-    s2d_particles_render();
 }
 
 void system_move(f32 timeStep) {
@@ -159,28 +212,27 @@ void system_control(f32 timeStep) {
                 clm_v2_scalar_mul(0.5f, PLAYER_SIZE));
         clmVec2 vel = velCmp->velocity;
         f32 bulletSpeed = BULLET_SPEED;
-        static f32 canShoot = 0.0f;
-        f32 shootTime = 0.2f;
-        canShoot -= timeStep;
-        if (canShoot <= 0) {
-            canShoot = 0.0f;
+        const f32 shotRate = 4.0f;
+        gData->shotTimer += timeStep;
+        if (gData->shotTimer >= 1.0f / shotRate) {
+            gData->shotTimer = 100.0f; // cap this so doesnt go negative.
             if (s2d_keydown(S2D_KEY_LEFT)) {
-                canShoot = shootTime;
+                gData->shotTimer = 0.0f;
                 create_bullet(
                         bulletPosition, 
                         (clmVec2) { -bulletSpeed, vel.y });
             } else if (s2d_keydown(S2D_KEY_RIGHT)) {
-                canShoot = shootTime;
+                gData->shotTimer = 0.0f;
                 create_bullet(
                         bulletPosition, 
                         (clmVec2) { bulletSpeed, vel.y });
             } else if (s2d_keydown(S2D_KEY_UP)) {
-                canShoot = shootTime;
+                gData->shotTimer = 0.0f;
                 create_bullet(
                         bulletPosition, 
                         (clmVec2) { vel.x, bulletSpeed });
             } else if (s2d_keydown(S2D_KEY_DOWN)) {
-                canShoot = shootTime;
+                gData->shotTimer = 0.0f;
                 create_bullet(
                         bulletPosition, 
                         (clmVec2) { vel.x, -bulletSpeed });
@@ -398,27 +450,4 @@ void system_animation(f32 timeStep) {
 }
 
 void system_fps(f32 timeStep) {
-    static i32 frames = 0;
-    static i32 displayFrames = 0;
-    static f32 time = 0.0f;
-
-    frames++;
-    time += timeStep;
-
-    if (time >= 0.25f) {
-        displayFrames = frames;
-        frames = 0;
-        time   = 0.0f;
-    }
-
-    clmVec4 scrRect = s2d_get_screen_rect();
-    s2d_text_render(
-            "BigBlueTerm",
-            (clmVec2) { 10.0f, 12.0f },
-            (clmVec4) { 0.0f, 0.0f, 0.0f, 1.0f },
-            0.5f,
-            TEXT_LAYER,
-            "fps: %d",
-            4 * displayFrames
-            );
 }

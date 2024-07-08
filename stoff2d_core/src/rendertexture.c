@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 
-u32 s2d_rendertexture_create(
+RenderTexture s2d_rendertexture_create(
         u32  textureWidth,
         u32  textureHeight,
         u32  numChannels,
@@ -33,7 +33,7 @@ u32 s2d_rendertexture_create(
     glTexParameteri(
             GL_TEXTURE_2D,
             GL_TEXTURE_MIN_FILTER, 
-            GL_LINEAR_MIPMAP_LINEAR);
+            GL_LINEAR);
     glTexParameteri(
             GL_TEXTURE_2D, 
             GL_TEXTURE_MAG_FILTER, 
@@ -77,13 +77,15 @@ u32 s2d_rendertexture_create(
         fprintf(stderr, "[S2D Error] failed to create font render texture\n");
     }
 
-    return renderTexture;
+    return (RenderTexture) {
+        .frameBufferID = frameBuffer,
+        .textureID     = renderTexture,
+        .width         = textureWidth,
+        .height        = textureHeight
+    };
 }
 
-void s2d_rendertexture_set_target(
-        u32 renderTexture,
-        u32 textureWidth,
-        u32 textureHeight) {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, renderTexture);
-    glViewport(0, 0, textureWidth, textureHeight);
+void s2d_rendertexture_set_target(RenderTexture renderTexture) {
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, renderTexture.frameBufferID);
+    glViewport(0, 0, renderTexture.width, renderTexture.height);
 }

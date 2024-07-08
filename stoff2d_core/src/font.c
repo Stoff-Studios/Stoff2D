@@ -23,6 +23,8 @@ u32 vao;
 u32 vbo;
 u32 shader;
 
+RenderTexture renderTexture;
+
 void setup_gl_for_render_to_texture() { 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -54,12 +56,12 @@ void setup_gl_for_render_to_texture() {
 
 bool load_font(s2dFont* font, const char* fileName) {
     // create new texture to render to
-    u32 renderTexture = s2d_rendertexture_create(
+    renderTexture = s2d_rendertexture_create(
             RENDER_TEX_W,
             RENDER_TEX_H,
             4,
             false);
-    s2d_rendertexture_set_target(renderTexture, RENDER_TEX_W, RENDER_TEX_H);
+    s2d_rendertexture_set_target(renderTexture);
 
     // construct path with file name and fonts folder.
     const char* fontsDir = S2D_FONTS_FOLDER;
@@ -114,8 +116,7 @@ bool load_font(s2dFont* font, const char* fileName) {
                 0,
                 GL_RED,
                 GL_UNSIGNED_BYTE,
-                face->glyph->bitmap.buffer
-                );
+                face->glyph->bitmap.buffer);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -154,7 +155,7 @@ bool load_font(s2dFont* font, const char* fileName) {
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         // store the character
-        font->fontTexID = renderTexture;
+        font->fontTexID = renderTexture.textureID;
         font->chars[c] = (s2dChar) {
             (Frame) { 
                 x / (float) RENDER_TEX_W, 
@@ -174,8 +175,9 @@ bool load_font(s2dFont* font, const char* fileName) {
 
     FT_Done_Face(face);
 
-    glBindTexture(GL_TEXTURE_2D, renderTexture);
+    glBindTexture(GL_TEXTURE_2D, renderTexture.textureID);
     glGenerateMipmap(GL_TEXTURE_2D);
+    glDeleteFramebuffers(1, &renderTexture.frameBufferID);
 
     return true;
 }

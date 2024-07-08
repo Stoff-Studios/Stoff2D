@@ -10,6 +10,27 @@
 
 GameData gData;
 
+void update_shaders() {
+    s2d_shader_set_uniform_mat4(
+            gData.canvasShader,
+            "proj",
+            s2d_camera_projection());
+    s2d_shader_set_uniform_mat4(
+            gData.canvasShader,
+            "view",
+            s2d_camera_view());
+    s2d_shader_set_uniform_mat4(
+            gData.screenShader,
+            "proj",
+            clm_mat4_ortho(
+                0, 
+                s2d_get_viewport_dimensions().x,
+                0,
+                s2d_get_viewport_dimensions().y,
+                0.0f, 
+                10.0f));
+}
+
 void game_update(f32 timeStep) {
     // Quit.
     if (s2d_keydown(S2D_KEY_Q)) {
@@ -47,8 +68,8 @@ void game_update(f32 timeStep) {
         gData.renderHitboxes = false;
     }
 
-
-    system_control();
+    update_shaders();
+    system_control(timeStep);
     system_spawn_enemies(timeStep);
     system_enemy(timeStep);
     system_move(timeStep);
@@ -67,13 +88,12 @@ void game_init() {
         fprintf(stderr, "Could not initialise stoff2d\n");
         exit(1);
     }
-    s2d_ecs_initialise();
-    s2d_clear_colour(CLEAR_COLOUR);
-    s2d_set_frame_cap(S2D_FPS_VSYNC);
+
+    s2d_set_frame_cap(1000);
 
     entites_set_game_data_ptr(&gData);
     systems_set_game_data_ptr(&gData);
-    particle_types_init();
+    particles_set_game_data_ptr(&gData);
 
     gData.texHitBox       = s2d_load_texture("hitbox.png");
     gData.texSkeletonWalk = s2d_load_texture("skeleton_walk.png");
@@ -84,10 +104,20 @@ void game_init() {
     gData.running = true;
     gData.renderHitboxes = true;
     gData.paused = false;
+    gData.shotTimer = 0.0f;
 
+    gData.canvas = s2d_rendertexture_create(
+            s2d_get_screen_dimensions().x,
+            s2d_get_screen_dimensions().y,
+            4,
+            false);
+    gData.canvasShader = s2d_shader_create("vCanvas.glsl", "fCanvas.glsl");
+    gData.screenShader = s2d_shader_create("vScreen.glsl", "fScreen.glsl");
+
+    s2d_ecs_initialise();
+    particle_types_init();
 
     gData.playerEID = create_player((clmVec2) { 0.0f, 0.0f });
-    create_enemy((clmVec2) {0, 0});
 }
 
 void game_run() {

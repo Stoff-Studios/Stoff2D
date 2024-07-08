@@ -118,6 +118,12 @@ u32 s2d_load_texture(const char* fileName);
  */
 void s2d_clear_colour(clmVec4 colour);
 
+/* s2d_clear
+ * ---------
+ * clear the current render target.
+ */
+void s2d_clear();
+
 /* s2d_text_render
  * ---------------
  * Render text to the screen.
@@ -173,6 +179,18 @@ void s2d_set_texture_slot(
         const char* uniformName,
         u32 slot,
         u32 texture);
+
+/* s2d_render_flush
+ * ----------------
+ * flush all sprites to the current render target.
+ */
+void s2d_render_flush();
+
+/* s2d_set_blend_mode
+ * ------------------
+ * set the blend mode used when rendering.
+ */
+void s2d_set_blend_mode(s2dBlendMode blendMode);
 
 /*****************************************************************************/
 
@@ -276,6 +294,12 @@ clmVec4 s2d_get_screen_rect();
  * Useful for UI placement.
  */
 clmVec2 s2d_get_viewport_dimensions();
+
+/* s2d_get_screen_dimensions
+ * -------------------------
+ * Returns the width and height of the screen.
+ */
+clmVec2 s2d_get_screen_dimensions();
 
 /*****************************************************************************/
 
