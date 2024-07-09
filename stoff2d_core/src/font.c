@@ -23,7 +23,7 @@ u32 vao;
 u32 vbo;
 u32 shader;
 
-RenderTexture renderTexture;
+s2dRenderTexture renderTexture;
 
 void setup_gl_for_render_to_texture() { 
     glGenVertexArrays(1, &vao);
@@ -157,7 +157,7 @@ bool load_font(s2dFont* font, const char* fileName) {
         // store the character
         font->fontTexID = renderTexture.textureID;
         font->chars[c] = (s2dChar) {
-            (Frame) { 
+            (s2dFrame) { 
                 x / (float) RENDER_TEX_W, 
                 y / (float) RENDER_TEX_H, 
                 w / (float) RENDER_TEX_W,

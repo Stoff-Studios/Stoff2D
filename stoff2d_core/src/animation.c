@@ -11,7 +11,7 @@ typedef struct {
     // Key.
     char name[S2D_MAX_ANIMATION_NAME_LEN];
     // Value.
-    Animation animation;
+    s2dAnimation animation;
 
     // Probing.
     bool empty;
@@ -57,13 +57,13 @@ bool is_end_animation(const char* line) {
 }
 
 // print frame for debugging.
-void print_frame(Frame* frame) {
+void print_frame(s2dFrame* frame) {
     printf("Frame(%.2f, %.2f, %.2f, %.2f)", 
             frame->x, frame->y, frame->w, frame->h);
 }
 
 // print animation for debugging.
-void print_animation(Animation* animation) {
+void print_animation(s2dAnimation* animation) {
     printf("ANIMATION START\n");
     printf("frameCount: %u\n", animation->frameCount);
     printf("frames: [");
@@ -87,7 +87,7 @@ void print_table() {
     printf("TABLE END\n");
 }
 
-void animations_put(const char* name, Animation animation) {
+void animations_put(const char* name, s2dAnimation animation) {
     // Don't allow load factor to creep over 50%. 
     if (animationsCount == S2D_MAX_ANIMATIONS) {
         fprintf(stderr, 
@@ -112,7 +112,7 @@ void animations_put(const char* name, Animation animation) {
 
     // Insert the data into the free slot.
     strcpy(entry->name, name);
-    memcpy(&entry->animation, &animation, sizeof(Animation));
+    memcpy(&entry->animation, &animation, sizeof(s2dAnimation));
     entry->empty = false;
     animationsCount++;
 }
@@ -157,7 +157,7 @@ void parse_ani_file() {
                 }
             }
             // Get the frames.
-            Animation animation;
+            s2dAnimation animation;
             animation.frameCount = 0;
             while(fgets(line, LINE_BUFFER_SIZE, aniFile)) {
                 if (is_blank_or_comment(line)) {
@@ -176,7 +176,7 @@ void parse_ani_file() {
                 }
                 f32 x = atof(strtok(line, ","));
                 f32 y = atof(strtok(NULL, ","));
-                Frame frame = (Frame) {
+                s2dFrame frame = (s2dFrame) {
                     .x = x * spriteW,
                     .y = y * spriteH,
                     .w = spriteW,
@@ -196,13 +196,13 @@ void animations_init() {
     for (u32 i = 0; i < TABLE_SIZE; i++) {
         HashEntry* entry = &animations[i];
         strcpy(entry->name, "NONE");
-        memset(&entry->animation, 0, sizeof(Animation));
+        memset(&entry->animation, 0, sizeof(s2dAnimation));
         entry->empty = true;
     }
     parse_ani_file();
 }
 
-Animation* s2d_animations_get(const char* name) {
+s2dAnimation* s2d_animations_get(const char* name) {
     // Quadratic probe until we find the animation.
     HashEntry* entry;
     u64 index;

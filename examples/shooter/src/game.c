@@ -89,7 +89,7 @@ void game_init() {
         exit(1);
     }
 
-    s2d_set_frame_cap(1000);
+    s2d_set_frame_cap(S2D_FPS_VSYNC);
 
     entites_set_game_data_ptr(&gData);
     systems_set_game_data_ptr(&gData);
@@ -105,6 +105,7 @@ void game_init() {
     gData.renderHitboxes = true;
     gData.paused = false;
     gData.shotTimer = 0.0f;
+    gData.killCount = 0;
 
     gData.canvas = s2d_rendertexture_create(
             s2d_get_screen_dimensions().x,

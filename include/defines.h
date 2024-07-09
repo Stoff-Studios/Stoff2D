@@ -19,7 +19,7 @@
 
 /*********************************** Misc ************************************/
 
-#define S2D_ENTIRE_TEXTURE ((Frame) { 0.0f, 0.0f, 1.0f, 1.0f })
+#define S2D_ENTIRE_TEXTURE ((s2dFrame) { 0.0f, 0.0f, 1.0f, 1.0f })
 
 /*****************************************************************************/
 
@@ -97,14 +97,14 @@ typedef struct {
     clmVec2 position;
     clmVec2 texCoord;
     clmVec4 colour;
-} Vertex;
+} s2dVertex;
 
 typedef struct {
     u32 frameBufferID;
     u32 textureID;
     u32 width;
     u32 height;
-} RenderTexture;
+} s2dRenderTexture;
 
 typedef enum {
     BLEND_MODE_RENDER_TO_TEXTURE,
@@ -123,23 +123,23 @@ typedef struct {
     f32 y;
     f32 w;
     f32 h;
-} Frame;
+} s2dFrame;
 
 // An Animation is a sequence of Frames
 typedef struct {
-    Frame frames[S2D_MAX_ANIMATION_FRAMES];
-    u32   frameCount;
-} Animation;
+    s2dFrame frames[S2D_MAX_ANIMATION_FRAMES];
+    u32      frameCount;
+} s2dAnimation;
 
 // For sprite renderer.
 typedef struct {
-    clmVec2 position;
-    clmVec2 size;
-    clmVec4 colour;
-    u32     texture;
-    Frame   frame;
-    u8      layer;
-    u32     shader;
+    clmVec2  position;
+    clmVec2  size;
+    clmVec4  colour;
+    u32      texture;
+    s2dFrame frame;
+    u8       layer;
+    u32      shader;
 } s2dSprite;
 
 /*****************************************************************************/
@@ -148,17 +148,17 @@ typedef struct {
 /******************************** Particles **********************************/
 
 typedef struct {
-    u32     count;           // number of particles to spawn.
-    f32     lifeTime;        // lifetime of each particle in seconds.
-    clmVec2 position;
-    clmVec2 lowerVelocity;   // lower velocity bound.
-    clmVec2 upperVelocity;   // upper velocity bound.
-    clmVec2 lowerSize;       // lower size bound.
-    clmVec2 upperSize;       // upper size bound.
-    clmVec4 birthColour;     // start colour.
-    clmVec4 deathColour;     // end colour.
-    char    spriteName[32];  // name of a sprite in S2D_PARTICLE_SPRITES_FOLDER
-    u32     shader;
-} ParticleData;
+    u32         count;         // number of particles to spawn per add call.
+    f32         lifeTime;      // lifetime of each particle in seconds.
+    clmVec2     lowerVelocity; // lower bound for birth velocity.
+    clmVec2     upperVelocity; // upper bound for birth velocity.
+    u32         lowerSize;     // lower bound for birth size, in pixels.
+    u32         upperSize;     // upper bound for birth size, in pixels.
+    clmVec4     birthColour;   // birth colour.
+    clmVec4     deathColour;   // death colour.
+    u32         shader;        // shader program to render particles with.
+    const char* spriteName;    // png file name in S2D_PARTICLE_SPRITES_FOLDER
+                               // (not including .png)
+} s2dParticleType;
 
 /*****************************************************************************/

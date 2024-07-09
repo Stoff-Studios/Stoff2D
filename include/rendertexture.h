@@ -6,7 +6,7 @@
  * ------------------------
  * Create a new framebuffer to render to.
  */
-RenderTexture s2d_rendertexture_create(
+s2dRenderTexture s2d_rendertexture_create(
         u32  width,
         u32  height,
         u32  numChannels,
@@ -16,7 +16,7 @@ RenderTexture s2d_rendertexture_create(
  * ----------------------------
  * Set a texture as a render target.
  */
-void s2d_rendertexture_set_target(RenderTexture renderTexture);
+void s2d_rendertexture_set_target(s2dRenderTexture renderTexture);
 
 /* s2d_rendertexture_set_target_screen
  * -----------------------------------

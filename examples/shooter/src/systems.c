@@ -15,6 +15,10 @@ f32 randfnorm() {
     return ((f32) rand() / (f32) RAND_MAX);
 }
 
+clmVec2 get_center(clmVec2 pos, clmVec2 size) {
+    return clm_v2_add(pos, clm_v2_scalar_mul(0.5f, size));
+}
+
 bool hitboxes_collided(HitBoxComponent a, HitBoxComponent b) {
     f32 aLeft   = a.position.x;
     f32 aRight  = a.position.x + a.size.x;
@@ -87,7 +91,7 @@ void system_render(f32 timeStep) {
                         .size = hitboxCmp->hitbox.size,
                         .colour = (clmVec4) { 1.0f, 0.0f, 0.0f, 1.0f },
                         .texture = gData->texHitBox,
-                        .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+                        .frame = (s2dFrame) { 0.0f, 0.0f, 1.0f, 1.0f },
                         .layer = HITBOX_LAYER,
                         .shader = gData->canvasShader
                     });
@@ -136,6 +140,7 @@ void system_render(f32 timeStep) {
             "Stoff2D"
             );
 
+
     // render fps
     static i32 frames = 0;
     static i32 displayFrames = 0;
@@ -150,16 +155,35 @@ void system_render(f32 timeStep) {
         time   = 0.0f;
     }
 
-    clmVec4 scrRect = s2d_get_screen_rect();
     s2d_text_render(
             "BigBlueTerm",
             (clmVec2) { 10.0f, 12.0f },
-            (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
+            (clmVec4) {            
+                fabs(sinf(x)),    
+                fabs(cosf(2 * x)), 
+                fabs(sinf(3*x)), 
+                1.0f 
+            },
             0.5f,
             TEXT_LAYER,
             "fps: %d",
             4 * displayFrames
             );
+
+    // render kill count
+    s2d_text_render(
+            "BigBlueTerm",
+            clm_v2_scalar_mul(0.128f, s2d_get_viewport_dimensions()),
+            (clmVec4) {            
+                fabs(sinf(x)),    
+                fabs(cosf(2 * x)), 
+                fabs(sinf(3*x)), 
+                1.0f 
+            },
+            1.0f,
+            TEXT_LAYER,
+            "foes foresaken: %u",
+            gData->killCount);
 
     s2d_sprite_renderer_render_sprites();
 }
@@ -206,7 +230,12 @@ void system_control(f32 timeStep) {
         PositionComponent* posCmp = &cmp->position;
 
         // Lock camera to player.
-        s2d_camera_set_pos(posCmp->position);
+        if (s2d_ecs_entity_has(eID, CMP_TYPE_SPRITE)) {
+            Component* spriteCmp = s2d_ecs_get_component(eID, CMP_TYPE_SPRITE);
+            s2d_camera_set_pos(get_center(
+                        posCmp->position,
+                        spriteCmp->sprite.size));
+        }
 
         clmVec2 bulletPosition = clm_v2_add(posCmp->position,
                 clm_v2_scalar_mul(0.5f, PLAYER_SIZE));
@@ -269,10 +298,9 @@ void system_particles(f32 timeStep) {
                 continue;
             }
             Component* posCmp = s2d_ecs_get_component(eID, CMP_TYPE_POSITION);
-            ParticleData pData;
-            pData = *particle_type_data(emitter->particleEmitter.particleType);
-            pData.position = posCmp->position.position;
-            s2d_particles_add(&pData);
+            s2d_particles_add(
+                    particle_type_data(emitter->particleEmitter.particleType),
+                    posCmp->position.position);
         }
     }
 }
@@ -382,23 +410,33 @@ void system_damage() {
                     damageCmp->damage.currentCooldown > 0.0f) {
                 continue;
             }
+
             Component* damageHB = s2d_ecs_get_component(damageEID, CMP_TYPE_HITBOX);
             if (hitboxes_collided(healthHB->hitbox, damageHB->hitbox)) {
-                ParticleData pData;
-                pData = *particle_type_data(PARTICLE_TYPE_BLOOD);
-                pData.position = 
-                    clm_v2_add(healthHB->hitbox.position,
-                            clm_v2_scalar_mul(0.5f, healthHB->hitbox.size));
-                s2d_particles_add(&pData);
+                clmVec2 pPos = clm_v2_add(
+                        damageHB->hitbox.position,
+                        clm_v2_scalar_mul(0.5f, damageHB->hitbox.size));
+
+                s2d_particles_add(
+                        particle_type_data(PARTICLE_TYPE_BLOOD),
+                        pPos);
+
                 healthCmp->health.hp -= damageCmp->damage.damage;
+
                 if (healthCmp->health.hp <= 0.0f) {
-                    pData = *particle_type_data(PARTICLE_TYPE_BIG_BLOOD);
-                    pData.position = 
-                        clm_v2_add(healthHB->hitbox.position,
-                                clm_v2_scalar_mul(0.5f, healthHB->hitbox.size));
-                    s2d_particles_add(&pData);
+                    pPos = clm_v2_add(
+                            healthHB->hitbox.position,
+                            clm_v2_scalar_mul(0.5f, healthHB->hitbox.size));
+
+                    s2d_particles_add(
+                            particle_type_data(PARTICLE_TYPE_BIG_BLOOD),
+                            pPos);
+
                     create_skeleton_death_animation(healthHB->hitbox.position);
+
                     s2d_ecs_delete_entity(healthEID);
+
+                    gData->killCount++;
                 } else {
                     healthCmp->health.invinsibilityTimer = 
                         healthCmp->health.invinsibilityTime;

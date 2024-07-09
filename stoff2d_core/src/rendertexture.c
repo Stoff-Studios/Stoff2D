@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 
-RenderTexture s2d_rendertexture_create(
+s2dRenderTexture s2d_rendertexture_create(
         u32  textureWidth,
         u32  textureHeight,
         u32  numChannels,
@@ -77,7 +77,7 @@ RenderTexture s2d_rendertexture_create(
         fprintf(stderr, "[S2D Error] failed to create font render texture\n");
     }
 
-    return (RenderTexture) {
+    return (s2dRenderTexture) {
         .frameBufferID = frameBuffer,
         .textureID     = renderTexture,
         .width         = textureWidth,
@@ -85,7 +85,7 @@ RenderTexture s2d_rendertexture_create(
     };
 }
 
-void s2d_rendertexture_set_target(RenderTexture renderTexture) {
+void s2d_rendertexture_set_target(s2dRenderTexture renderTexture) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, renderTexture.frameBufferID);
     glViewport(0, 0, renderTexture.width, renderTexture.height);
 }

@@ -75,12 +75,12 @@ u32 s2d_get_text_shader();
  *     shader program to use for this quad.
  */
 void s2d_render_quad(
-        clmVec2 position,
-        clmVec2 size,
-        clmVec4 colour,
-        u32     texture,
-        Frame   frame,
-        u32     shader);
+        clmVec2  position,
+        clmVec2  size,
+        clmVec4  colour,
+        u32      texture,
+        s2dFrame frame,
+        u32      shader);
 
 /* s2d_render_coloured_quad
  * ------------------------
@@ -361,7 +361,7 @@ clmMat4 s2d_camera_projection();
  * Animations are loaded from res/animations/animations.ani
  * Look at README.ani to learn how to add animations.
  */
-Animation* s2d_animations_get(const char* name);
+s2dAnimation* s2d_animations_get(const char* name);
 
 /*****************************************************************************/
 
@@ -370,20 +370,18 @@ Animation* s2d_animations_get(const char* name);
 
 /* s2d_particles_add
  * -----------------
- * Spawn a cluster of partcles with properties defined by
- * ParticleData.
+ * Spawn a cluster of partcles with properties specified in parameter 
+ * particleType.
  *
- * count determines how many particles are spawned.
- *
- * The velocity and size of each particle will be linearly 
- * distributed between,
- * [lowerVelocity, upperVelocity] and
- * [lowerSize, upperSize] respectively.
+ * within particlType,
+ *  - count specifies the amount of particles generated.
+ *  - the starting velocity and size of each particle will be linearly 
+ *    distributed between their lower and upper velocity/size respectively.
  *
  * The colour of each particle will be linearly interpolated
  * between birthColour and deathColour over each particles lifeTime.
  */
-void s2d_particles_add(ParticleData* particlesData);
+void s2d_particles_add(const s2dParticleType* particleType, clmVec2 position);
 
 /* s2d_particles_render
  * --------------------

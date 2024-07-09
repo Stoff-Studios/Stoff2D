@@ -25,18 +25,18 @@ typedef struct {
     f32          aspectRatio;
 
     // Renderer
-    u32     vao;
-    u32     vbo;
-    u32     ebo;
-    u32     quadShader;
-    u32     textShader;
-    Vertex  vertices[S2D_MAX_VERTICES];
-    Vertex* currentVertex;
-    u32     indicesCount;
-    u32     verticesCount;
-    u32     lastTexture;
-    u32     lastShader;
-    u32     whiteTex;
+    u32        vao;
+    u32        vbo;
+    u32        ebo;
+    u32        quadShader;
+    u32        textShader;
+    s2dVertex  vertices[S2D_MAX_VERTICES];
+    s2dVertex* currentVertex;
+    u32        indicesCount;
+    u32        verticesCount;
+    u32        lastTexture;
+    u32        lastShader;
+    u32        whiteTex;
 
     // Time
     f64         lastTime;
@@ -276,7 +276,7 @@ void render_flush(u32 shader) {
     glBufferSubData(
             GL_ARRAY_BUFFER,
             0,
-            engine.verticesCount * sizeof(Vertex),
+            engine.verticesCount * sizeof(s2dVertex),
             engine.vertices);
 
     // Render draw call.
@@ -292,12 +292,12 @@ void render_flush(u32 shader) {
 }
 
 void s2d_render_quad(
-        clmVec2 position, 
-        clmVec2 size, 
-        clmVec4 colour,
-        u32     texture,  
-        Frame   frame,
-        u32     shader) {
+        clmVec2  position, 
+        clmVec2  size, 
+        clmVec4  colour,
+        u32      texture,  
+        s2dFrame frame,
+        u32      shader) {
     // Flush upon filling up the buffer or texture/shader change.
     if (engine.verticesCount == S2D_MAX_VERTICES ||
             engine.lastTexture != texture ||
@@ -353,7 +353,7 @@ void s2d_render_coloured_quad(
             size,
             colour,
             engine.whiteTex,
-            (Frame) {  0.0f, 0.0f, 1.0f, 1.0f },
+            (s2dFrame) {  0.0f, 0.0f, 1.0f, 1.0f },
             engine.quadShader);
 }
 
@@ -400,7 +400,7 @@ void renderer_init() {
     glBindBuffer(GL_ARRAY_BUFFER, engine.vbo);
     glBufferData(
             GL_ARRAY_BUFFER,
-            S2D_MAX_VERTICES * sizeof(Vertex),
+            S2D_MAX_VERTICES * sizeof(s2dVertex),
             NULL,
             GL_DYNAMIC_DRAW);
 
@@ -411,8 +411,8 @@ void renderer_init() {
             2,                                   // number of elements
             GL_FLOAT,                            // data type of the elements
             GL_FALSE,                            // normalise
-            sizeof(Vertex),                      // stride
-            (void*) offsetof(Vertex, position)); // offset
+            sizeof(s2dVertex),                      // stride
+            (void*) offsetof(s2dVertex, position)); // offset
     // attribute 1, texCoords
     glEnableVertexAttribArray(1);  
     glVertexAttribPointer(
@@ -420,8 +420,8 @@ void renderer_init() {
             2,                                    // number of elements
             GL_FLOAT,                             // data type of the elements
             GL_FALSE,                             // normalise
-            sizeof(Vertex),                       // stride
-            (void*) offsetof(Vertex, texCoord));  // offset
+            sizeof(s2dVertex),                       // stride
+            (void*) offsetof(s2dVertex, texCoord));  // offset
     // attribute 2, colour
     glEnableVertexAttribArray(2);  
     glVertexAttribPointer(
@@ -429,8 +429,8 @@ void renderer_init() {
             4,                                    // number of elements
             GL_FLOAT,                             // data type of the elements
             GL_FALSE,                             // normalise
-            sizeof(Vertex),                       // stride
-            (void*) offsetof(Vertex, colour));    // offset
+            sizeof(s2dVertex),                       // stride
+            (void*) offsetof(s2dVertex, colour));    // offset
 
     // ebo
     u32* indices = (u32*) malloc(S2D_MAX_INDICES * sizeof(u32));
@@ -734,7 +734,7 @@ void s2d_text_render_bitmap(
             size,
             colour,
             font->fontTexID,
-            (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+            (s2dFrame) { 0.0f, 0.0f, 1.0f, 1.0f },
             engine.quadShader);
 }
 

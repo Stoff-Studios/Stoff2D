@@ -11,6 +11,6 @@ typedef enum {
 
 void particles_set_game_data_ptr(GameData* gData);
 
-ParticleData* particle_type_data(ParticleType type);
+const s2dParticleType* particle_type_data(ParticleType type);
 
 void particle_types_init();

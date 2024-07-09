@@ -7,22 +7,23 @@
 #include <stdlib.h>
 #include <stbi/stbi_image.h>
 
-#define RENDER_TEX_W 1024
-#define RENDER_TEX_H 1024
-
 typedef struct {
     bool    active;
+
     f32     birthTime;
-    f32     currentDuration;
     f32     lifeTime;
+    f32     currentDuration;
+
     clmVec2 position;
     clmVec2 velocity;
     clmVec2 size;
+
     clmVec4 birthColour;
-    clmVec4 colourChange;
     clmVec4 currentColour;
-    char    spriteName[32]; 
+    clmVec4 colourChange;
+
     u32     shader;
+    u32     texture;
 } Particle;
 
 typedef struct {
@@ -95,68 +96,76 @@ f32 randf() {
     return ((f32) rand() / (f32) RAND_MAX);
 }
 
-void s2d_particles_add(ParticleData* pData) {
-    clmVec2 velVariation = clm_v2_add(
+void s2d_particles_add(const s2dParticleType* pData, clmVec2 position) {
+    // precalculate the variations for this particle type.
+    const clmVec2 velVariation = clm_v2_add(
             pData->upperVelocity, 
-            clm_v2_scalar_mul(-1, pData->lowerVelocity));
-
-    clmVec2 sizeVariation = clm_v2_add(
-            pData->upperSize, 
-            clm_v2_scalar_mul(-1, pData->lowerSize));
-
-    clmVec4 colourChange = (clmVec4) {
+            clm_v2_scalar_mul(-1.0f, pData->lowerVelocity));
+    const clmVec4 colourChange = (clmVec4) {
         .r = pData->deathColour.r - pData->birthColour.r,
         .g = pData->deathColour.g - pData->birthColour.g,
         .b = pData->deathColour.b - pData->birthColour.b,
         .a = pData->deathColour.a - pData->birthColour.a
     };
+    const f32 sizeVariation = pData->upperSize - pData->lowerSize;
 
     for (u32 i = 0; i < pData->count; i++) {
+        // circular array
         u64 pIndex = nextIndex++;
         nextIndex  = nextIndex % S2D_MAX_PARTICLES;
-
         Particle* particle = &particles[pIndex];
+
+        // only increment alive count if we are not overwriting an alive one
         if (!particle->active) {
             particle->active = true;
             aliveCount++;
         }
 
-        particle->birthTime       = glfwGetTime();
+        // birthTime
+        particle->birthTime = glfwGetTime();
+        // lifeTime
+        particle->lifeTime = pData->lifeTime,
+        // alive duration
         particle->currentDuration = 0.0f;
-        particle->lifeTime        = pData->lifeTime;
-        particle->position        = pData->position;
-        particle->velocity        = (clmVec2) {
+        // randomly set the size within the variation specified
+        f32 size = pData->lowerSize + (randf() * (f32) sizeVariation);
+        particle->size = (clmVec2) { size, size };
+        // starting position centered (varies by size)
+        particle->position = clm_v2_add(
+                position,
+                clm_v2_scalar_mul(-0.5f, particle->size));
+        // randomly set the velocity within variation specified
+        particle->velocity = (clmVec2) {
             pData->lowerVelocity.x + (velVariation.x * randf()),
             pData->lowerVelocity.y + (velVariation.y * randf())
         };
-        particle->size = (clmVec2) {
-            pData->lowerSize.x + (sizeVariation.x * randf()),
-            pData->lowerSize.y + (sizeVariation.y * randf())
-        };
-        particle->birthColour   = pData->birthColour;
+        // current colour
         particle->currentColour = pData->birthColour;
-        particle->colourChange  = colourChange;
-        strncpy(particle->spriteName, pData->spriteName, 32);
+        // colour variation
+        particle->colourChange = colourChange;
+        // texture
+        particle->texture = lookup_particle_texture(pData->spriteName);
+        // shader
         particle->shader = pData->shader;
+        // birthColour
+        particle->birthColour = pData->birthColour;
     }
 }
 
 void s2d_particles_render() {
     u64 renderedCount = 0;
     for (u64 i = 0; i < S2D_MAX_PARTICLES; i++) {
-        Particle p = particles[i];
-
         if (renderedCount == aliveCount) {
             break;
         }
-
+        Particle p = particles[i];
         if (p.active) {
             renderedCount++;
             s2d_render_quad(
                     p.position,
                     p.size,
                     p.currentColour,
-                    lookup_particle_texture(p.spriteName),
+                    p.texture,
                     S2D_ENTIRE_TEXTURE,
                     p.shader);
         }
@@ -167,32 +176,42 @@ void particles_update(f32 timeStep) {
     u64 updatedCount = 0;
     u64 diedCount    = 0;
     for (u64 i = 0; i < S2D_MAX_PARTICLES; i++) {
-        Particle* p = &particles[i];
         if (updatedCount == aliveCount) {
             break;
         }
-        if (p->active) {
-            updatedCount++;
-            p->currentDuration += timeStep;
-            if (p->currentDuration >= p->lifeTime) {
-                p->active = false;
-                diedCount++;
-            }
-            // Update position.
-            clmVec2 moveBy = clm_v2_scalar_mul(timeStep, p->velocity);
-            p->position = clm_v2_add(p->position, moveBy);
-            // Update colour.
-            f32 interpolation = p->currentDuration / p->lifeTime;
-            p->currentColour.r = 
-                p->birthColour.r + (p->colourChange.r * interpolation);
-            p->currentColour.g = 
-                p->birthColour.g + (p->colourChange.g * interpolation);
-            p->currentColour.b = 
-                p->birthColour.b + (p->colourChange.b * interpolation);
-            p->currentColour.a = 
-                p->birthColour.a + (p->colourChange.a * interpolation);
+
+        Particle* p = &particles[i];
+
+        if (!p->active) {
+            continue;
         }
+
+        updatedCount++;
+        p->currentDuration += timeStep;
+
+        if (p->currentDuration >= p->lifeTime) {
+            p->active = false;
+            diedCount++;
+            continue;
+        }
+
+        // update position.
+        p->position = clm_v2_add(
+                p->position,
+                clm_v2_scalar_mul(timeStep, p->velocity));
+
+        // Update colour.
+        f32 interpolation = p->currentDuration / p->lifeTime;
+        clmVec4 bc = p->birthColour;
+        clmVec4 cc = p->colourChange;
+        p->currentColour = (clmVec4) {
+            .r = bc.r + (interpolation * cc.r),
+            .g = bc.g + (interpolation * cc.g),
+            .b = bc.b + (interpolation * cc.b),
+            .a = bc.a + (interpolation * cc.a)
+        };
     }
+
     aliveCount -= diedCount;
 }
 

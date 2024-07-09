@@ -36,7 +36,7 @@ u32 create_player(clmVec2 pos) {
             .size = PLAYER_SIZE,
             .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
             .texture = gData->texPlayerIdle,
-            .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+            .frame = (s2dFrame) { 0.0f, 0.0f, 1.0f, 1.0f },
             .layer = PLAYER_LAYER
         }
     };
@@ -144,7 +144,7 @@ void create_bullet(clmVec2 position, clmVec2 velocity) {
             .damage = 10.0f,
             .cooldown = 0.1f,
             .currentCooldown = 0.0f,
-            .deleteOnHit = false
+            .deleteOnHit = true
         }
     };
 
@@ -183,7 +183,7 @@ void create_enemy(clmVec2 position) {
             .size = ENEMY_SIZE,
             .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
             .texture = gData->texSkeletonWalk,
-            .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+            .frame = (s2dFrame) { 0.0f, 0.0f, 1.0f, 1.0f },
             .layer = ENEMY_LAYER
         }
     };
@@ -266,7 +266,7 @@ void create_skeleton_death_animation(clmVec2 pos) {
             .size = (clmVec2) { 33.0f, 32.0f },
             .colour = (clmVec4) { 1.0f, 1.0f, 1.0f, 1.0f },
             .texture = gData->texSkeletonDie,
-            .frame = (Frame) { 0.0f, 0.0f, 1.0f, 1.0f },
+            .frame = (s2dFrame) { 0.0f, 0.0f, 1.0f, 1.0f },
             .layer = PLAYER_LAYER
         }
     };

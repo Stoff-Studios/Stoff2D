@@ -35,11 +35,11 @@ typedef struct {
 } PositionComponent;
 
 typedef struct {
-    clmVec2 size;
-    clmVec4 colour;
-    u32     texture;
-    Frame   frame;
-    u8      layer;
+    clmVec2  size;
+    clmVec4  colour;
+    u32      texture;
+    s2dFrame frame;
+    u8       layer;
 } SpriteComponent;
 
 typedef struct {
@@ -85,9 +85,9 @@ typedef struct {
 } HitBoxComponent;
 
 typedef struct {
-    Animation* animation;
-    f32        aniIndex;
-    f32        aniSpeed;
+    s2dAnimation* animation;
+    f32           aniIndex;
+    f32           aniSpeed;
 } AnimationComponent;
 
 typedef struct {

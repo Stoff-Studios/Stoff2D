@@ -7,9 +7,9 @@ typedef struct {
     bool renderHitboxes;
     bool paused;
 
-    RenderTexture canvas;       // rendertexture
-    u32           canvasShader; // for rendering to canvas texture.
-    u32           screenShader; // for rendering canvas to screen.
+    s2dRenderTexture canvas;       // rendertexture
+    u32              canvasShader; // for rendering to canvas texture.
+    u32              screenShader; // for rendering canvas to screen.
 
     u32  texFont;
     u32  texHitBox;
@@ -22,6 +22,8 @@ typedef struct {
     u32  playerEID;
 
     f32  shotTimer;
+
+    u32  killCount;
 } GameData;
 
 void game_init();
