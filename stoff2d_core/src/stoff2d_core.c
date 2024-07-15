@@ -37,6 +37,7 @@ typedef struct {
     u32        lastTexture;
     u32        lastShader;
     u32        whiteTex;
+    i32        maxTexSlots;
 
     // Time
     f64         lastTime;
@@ -116,8 +117,8 @@ bool s2d_initialise_engine(const char* programName) {
     engine.logStatsTimer = 0;
     engine.drawCalls     = 0;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RED_BITS,     mode->redBits);
     glfwWindowHint(GLFW_GREEN_BITS,   mode->greenBits);
@@ -147,6 +148,7 @@ bool s2d_initialise_engine(const char* programName) {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &engine.maxTexSlots);
 
     // Initialise fonts.
     if (!font_init()) {
@@ -310,7 +312,8 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y;
     engine.currentVertex->texCoord.x = frame.x;
     engine.currentVertex->texCoord.y = frame.y;
-    engine.currentVertex->colour = colour;
+    engine.currentVertex->colour     = colour;
+    engine.currentVertex->texSlot    = 0.f;
     engine.currentVertex++;
 
     // Bottom-right.
@@ -318,7 +321,8 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y;
     engine.currentVertex->texCoord.x = frame.x + frame.w;
     engine.currentVertex->texCoord.y = frame.y;
-    engine.currentVertex->colour = colour;
+    engine.currentVertex->colour     = colour;
+    engine.currentVertex->texSlot    = 0.f;
     engine.currentVertex++;
 
     // Top-right.
@@ -326,7 +330,8 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y + size.y;
     engine.currentVertex->texCoord.x = frame.x + frame.w;
     engine.currentVertex->texCoord.y = frame.y + frame.h;
-    engine.currentVertex->colour = colour;
+    engine.currentVertex->colour     = colour;
+    engine.currentVertex->texSlot    = 0.f;
     engine.currentVertex++;
 
     // Top-left.
@@ -334,7 +339,8 @@ void s2d_render_quad(
     engine.currentVertex->position.y = position.y + size.y;
     engine.currentVertex->texCoord.x = frame.x;
     engine.currentVertex->texCoord.y = frame.y + frame.h;
-    engine.currentVertex->colour = colour;
+    engine.currentVertex->colour     = colour;
+    engine.currentVertex->texSlot    = 0.f;
     engine.currentVertex++;
 
     // Increment our counts and update the last added texture and batch type.
@@ -358,11 +364,15 @@ void s2d_render_coloured_quad(
 }
 
 void s2d_set_texture_slot(
-        u32 shader,
-        const char* uniformName, 
         u32 slot, 
         u32 texture) {
-    s2d_shader_set_uniform_1i(shader, uniformName, slot);
+    if (slot >= engine.maxTexSlots) {
+        fprintf(stderr, 
+                "[S2D Warning] failed to bind texture to slot %u, exceeded "
+                "limit of %d\n", 
+                slot, engine.maxTexSlots);
+        return;
+    }
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, texture);
 }
@@ -431,6 +441,16 @@ void renderer_init() {
             GL_FALSE,                             // normalise
             sizeof(s2dVertex),                       // stride
             (void*) offsetof(s2dVertex, colour));    // offset
+    // attribute 3, texSlot
+    glEnableVertexAttribArray(3);  
+    glVertexAttribPointer(
+            3,                                     // attribute no.
+            1,                                     // number of elements
+            GL_FLOAT,                              // data type of the elements
+            GL_FALSE,                              // normalise
+            sizeof(s2dVertex),                     // stride
+            (void*) offsetof(s2dVertex, texSlot)); // offset
+
 
     // ebo
     u32* indices = (u32*) malloc(S2D_MAX_INDICES * sizeof(u32));

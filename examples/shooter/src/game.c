@@ -90,6 +90,7 @@ void game_init() {
     }
 
     s2d_set_frame_cap(1000);
+    s2d_set_flags(S2D_LOG_STATS);
 
     entites_set_game_data_ptr(&gData);
     systems_set_game_data_ptr(&gData);
@@ -99,6 +100,9 @@ void game_init() {
     gData.texSkeletonWalk = s2d_load_texture("skeleton_walk.png");
     gData.texSkeletonDie  = s2d_load_texture("skeleton_die.png");
     gData.texPlayerIdle   = s2d_load_texture("player_idle.png");
+
+    s2d_set_texture_slot(1, gData.texSkeletonWalk);
+
     gData.camZoom  = 500.0f;
     gData.camSpeed = 300.0f;
     gData.running = true;
@@ -114,6 +118,7 @@ void game_init() {
             false);
     gData.canvasShader = s2d_shader_create("vCanvas.glsl", "fCanvas.glsl");
     gData.screenShader = s2d_shader_create("vScreen.glsl", "fScreen.glsl");
+    s2d_shader_init_sampler2d(gData.canvasShader, "uTextures");
 
     s2d_ecs_initialise();
     particle_types_init();

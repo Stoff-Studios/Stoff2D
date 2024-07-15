@@ -172,11 +172,9 @@ void s2d_text_render_bitmap(
 
 /* s2d_set_texture_slot
  * --------------------
- * Set the corresponding texture slot to texture.
+ * Set the corresponding texture slot to use texture.
  */
 void s2d_set_texture_slot(
-        u32 shader,
-        const char* uniformName,
         u32 slot,
         u32 texture);
 

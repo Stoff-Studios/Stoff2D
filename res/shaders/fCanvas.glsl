@@ -1,11 +1,13 @@
-#version 330 core
+#version 450 core
 layout(location = 0) out vec4 result;
 
 in vec2 fTexCoord;
 in vec4 fColour;
+in float fTexSlot;
 
-uniform sampler2D spriteSheet; 
+uniform sampler2D uTextures[32]; 
 
 void main() {
-    result = fColour * texture(spriteSheet, fTexCoord);
+    int texIndex = int(fTexSlot);
+    result = fColour * texture(uTextures[texIndex], fTexCoord);
 } 

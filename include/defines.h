@@ -97,6 +97,7 @@ typedef struct {
     clmVec2 position;
     clmVec2 texCoord;
     clmVec4 colour;
+    f32     texSlot;
 } s2dVertex;
 
 typedef struct {

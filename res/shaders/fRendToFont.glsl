@@ -1,4 +1,4 @@
-#version 330 core
+#version 450 core
 
 in vec2 fTexCoords;
 layout(location = 0) out vec4 colour;

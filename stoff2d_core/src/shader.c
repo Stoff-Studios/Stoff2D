@@ -130,4 +130,16 @@ void s2d_shader_set_uniform_1f(
     glUniform1f(loc, f);
 }
 
-
+void s2d_shader_init_sampler2d(
+        unsigned int shader, 
+        const char* uniformName) {
+    s2d_shader_use(shader);
+    unsigned int loc = glGetUniformLocation(shader, uniformName);
+    int maxSlots;
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxSlots);
+    int* samplers = malloc(sizeof(int) * maxSlots);
+    for (int i = 0; i < maxSlots; i++) {
+        samplers[i] = i;
+    }
+    glUniform1iv(loc, maxSlots, samplers);
+}
