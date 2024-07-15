@@ -89,7 +89,7 @@ void game_init() {
         exit(1);
     }
 
-    s2d_set_frame_cap(S2D_FPS_VSYNC);
+    s2d_set_frame_cap(1000);
 
     entites_set_game_data_ptr(&gData);
     systems_set_game_data_ptr(&gData);

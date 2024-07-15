@@ -20,7 +20,8 @@ void particle_types_init() {
 
     particleTypes[PARTICLE_TYPE_BULLET] = (s2dParticleType) {
         .count         = 5,
-        .lifeTime      = 0.5f,
+        .lowerLifeTime = 0.2f,
+        .upperLifeTime = 0.7f,
         .lowerVelocity = (clmVec2) { -20.0f, -20.0f },
         .upperVelocity = (clmVec2) { 20.0f, 20.0f },
         .lowerSize     = 4,
@@ -33,7 +34,8 @@ void particle_types_init() {
 
     particleTypes[PARTICLE_TYPE_BLOOD] = (s2dParticleType) {
         .count         = 50,
-        .lifeTime      = 0.5f,
+        .lowerLifeTime = 0.2f,
+        .upperLifeTime = 0.7f,
         .lowerVelocity = (clmVec2) { -80.0f, -80.0f },
         .upperVelocity = (clmVec2) { 80.0f, 80.0f },
         .lowerSize     = 4,
@@ -46,7 +48,8 @@ void particle_types_init() {
 
     particleTypes[PARTICLE_TYPE_BIG_BLOOD] = (s2dParticleType) {
         .count         = 150,
-        .lifeTime      = 0.6f,
+        .lowerLifeTime = 0.2f,
+        .upperLifeTime = 0.8f,
         .lowerVelocity = (clmVec2) { -50.0f, -50.0f },
         .upperVelocity = (clmVec2) { 50.0f, 50.0f },
         .lowerSize     = 2,

@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <stbi/stbi_image.h>
 
+#include <math.h>
+
 typedef struct {
     bool    active;
 
@@ -108,6 +110,8 @@ void s2d_particles_add(const s2dParticleType* pData, clmVec2 position) {
         .a = pData->deathColour.a - pData->birthColour.a
     };
     const f32 sizeVariation = pData->upperSize - pData->lowerSize;
+    const f32 lifeTimeVariation = fabs(
+            pData->upperLifeTime - pData->lowerLifeTime);
 
     for (u32 i = 0; i < pData->count; i++) {
         // circular array
@@ -124,7 +128,7 @@ void s2d_particles_add(const s2dParticleType* pData, clmVec2 position) {
         // birthTime
         particle->birthTime = glfwGetTime();
         // lifeTime
-        particle->lifeTime = pData->lifeTime,
+        particle->lifeTime = pData->lowerLifeTime + (randf() * lifeTimeVariation),
         // alive duration
         particle->currentDuration = 0.0f;
         // randomly set the size within the variation specified

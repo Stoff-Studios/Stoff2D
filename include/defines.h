@@ -149,7 +149,8 @@ typedef struct {
 
 typedef struct {
     u32         count;         // number of particles to spawn per add call.
-    f32         lifeTime;      // lifetime of each particle in seconds.
+    f32         lowerLifeTime; // lower bound for particle lifetime.
+    f32         upperLifeTime; // upper bound for particle lifetime.
     clmVec2     lowerVelocity; // lower bound for birth velocity.
     clmVec2     upperVelocity; // upper bound for birth velocity.
     u32         lowerSize;     // lower bound for birth size, in pixels.
