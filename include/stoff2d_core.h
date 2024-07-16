@@ -37,20 +37,19 @@ void s2d_shutdown_engine();
 
 /* s2d_get_quad_shader
  * -------------------
- * Returns the default quad shader id used by the engine.
+ * Returns a default quad shader id used to render a quad to the screen
  */
 u32 s2d_get_quad_shader();
 
 /* s2d_get_quad_shader
  * -------------------
- * Returns the default text shader used by the engine.
+ * Returns a default text shader used to render text to the screen
  */
 u32 s2d_get_text_shader();
 
 /* s2d_render_quad
  * ---------------
- * Render a textured quad. 
- * For optimal performance, group render calls by texture.
+ * render a textured quad. 
  *
  * position:
  *     bottom-left position of the quad.
@@ -63,9 +62,7 @@ u32 s2d_get_text_shader();
  * 
  * texture:
  *     id handle to a texture (obtained by calling s2d_load_texture).
- *     Use S2D_COLOURED_QUAD_TEXTURE if you want to render a coloured quad with
- *     no texture. Although it is better to use s2d_render_coloured_quad in this 
- *     case.
+ *     Use S2D_COLOURED_QUAD_TEXTURE to render a coloured quad.
  * 
  * frame:
  *     normalised region of the texture to render. Frame = { 0, 0, 1, 1 } is
@@ -93,6 +90,19 @@ void s2d_render_quad(
  *     texture ID that can be used in s2d_render_quad. 
  */
 u32 s2d_load_texture(const char* fileName);
+
+/* s2d_set_texture_slot
+ * --------------------
+ * manually assign a texture to a texture slot. The assignment persists until
+ * either overriden or a call to s2d_reset_texture_slots is made
+ */
+void s2d_set_texture_slot(u32 slot, u32 texID);
+
+/* s2d_reset_texture_slots
+ * -----------------------
+ * undo any manual assignment of texture slots
+ */
+void s2d_reset_texture_slots();
 
 /* s2d_clear_colour
  * ----------------

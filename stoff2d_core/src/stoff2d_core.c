@@ -338,6 +338,14 @@ u32 s2d_load_texture(const char* fileName) {
     return texture;
 }
 
+void s2d_set_texture_slot(u32 slot, u32 texID) {
+    quad_renderer_set_texture_slot(engine.quadRenderer, slot, texID);
+}
+
+void s2d_reset_texture_slots() {
+    quad_renderer_reset_texture_slots(engine.quadRenderer);
+}
+
 void s2d_clear_colour(clmVec4 colour) {
     glClearColor(colour.r, colour.g, colour.b, colour.a);
 }

@@ -35,6 +35,21 @@ void quad_renderer_submit_quad(
         s2dFrame     texSubRegion,
         u32          shader);
 
+/* quad_renderer_set_texture_slot
+ * ------------------------------
+ * manually override a texture slot to be a certain texture
+ */
+void quad_renderer_set_texture_slot(
+        QuadRenderer renderer,
+        u32 texID,
+        u32 slot);
+
+/* quad_renderer_reset_texture_slot
+ * --------------------------------
+ * unset any manual texture slot assignments
+ */
+void quad_renderer_reset_texture_slots(QuadRenderer renderer);
+
 /* quad_renderer_print_stats
  * -------------------------
  * print renderer statistics
