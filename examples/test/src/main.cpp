@@ -60,6 +60,7 @@ int main() {
                 { 1.f, 1.f, 1.f, 1.f },
                 1.f,
                 0,
+                s2d_get_text_shader(),
                 "Stoff2D");
 
         s2d_sprite_renderer_render_sprites();

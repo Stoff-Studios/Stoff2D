@@ -139,6 +139,7 @@ void s2d_text_render(
         clmVec4     colour,
         f32         scale,
         u32         layer,
+        u32         shader,
         const char* formatText,
         ...);
 

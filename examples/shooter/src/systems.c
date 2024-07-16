@@ -136,6 +136,7 @@ void system_render(f32 timeStep) {
             },
             1.5f,
             TEXT_LAYER,
+            s2d_get_text_shader(),
             "%s", 
             "Stoff2D"
             );
@@ -166,6 +167,7 @@ void system_render(f32 timeStep) {
             },
             0.5f,
             TEXT_LAYER,
+            s2d_get_text_shader(),
             "fps: %d",
             4 * displayFrames
             );
@@ -182,6 +184,7 @@ void system_render(f32 timeStep) {
             },
             1.0f,
             TEXT_LAYER,
+            s2d_get_text_shader(),
             "foes foresaken: %u",
             gData->killCount);
 

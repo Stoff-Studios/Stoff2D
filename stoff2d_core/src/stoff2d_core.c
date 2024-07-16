@@ -152,7 +152,7 @@ bool s2d_initialise_engine(const char* programName) {
     engine.quadShader = s2d_shader_create(
             "engine/vQuad.glsl", "engine/fQuad.glsl");
     engine.textShader = s2d_shader_create(
-            "engine/vText.glsl", "engine/fText.glsl");
+            "engine/vText.glsl", "engine/fQuad.glsl");
 
     animations_init();
     sprite_renderer_init();
@@ -568,6 +568,7 @@ void s2d_text_render(
         clmVec4     colour,
         f32         scale,
         u32         layer,
+        u32         shader,
         const char* formatText,
         ...) {
     // query font.
@@ -610,7 +611,7 @@ void s2d_text_render(
             .colour  = colour,
             .frame   = c.texRegion,
             .layer   = layer,
-            .shader  = engine.textShader
+            .shader  = shader
         };
         s2d_sprite_renderer_add_sprite(glyphSprite);
         position.x += (c.advance >> 6) * scale;
