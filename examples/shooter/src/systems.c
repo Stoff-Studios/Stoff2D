@@ -134,7 +134,7 @@ void system_render(f32 timeStep) {
                 fabs(sinf(3*x)), 
                 1.0f 
             },
-            2.0f,
+            1.5f,
             TEXT_LAYER,
             "%s", 
             "Stoff2D"
@@ -485,7 +485,4 @@ void system_animation(f32 timeStep) {
                 animationCmp->animation.animation->frames[(u64) animationCmp->animation.aniIndex];
         }
     }
-}
-
-void system_fps(f32 timeStep) {
 }

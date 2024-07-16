@@ -23,7 +23,7 @@
 #define S2D_MAX_ENTITIES 10000
 
 // Particles.
-#define S2D_MAX_PARTICLES 50000
+#define S2D_MAX_PARTICLES 100000
 
 // Camera.
 #define S2D_CAM_INITIAL_ZOOM 200.0f

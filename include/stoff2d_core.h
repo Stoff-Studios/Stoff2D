@@ -82,24 +82,6 @@ void s2d_render_quad(
         s2dFrame frame,
         u32      shader);
 
-/* s2d_render_coloured_quad
- * ------------------------
- * Render a coloured quad.
- *
- * position:
- *     bottom-left position of the quad.
- * 
- * size:
- *     width and height (in pixels) of the quad.
- * 
- * colour:
- *     rgba colour of the quad.
- */
-void s2d_render_coloured_quad(
-        clmVec2 position,
-        clmVec2 size,
-        clmVec4 colour);
-
 /* s2d_load_texture
  * ----------------
  * Load a texture.
@@ -169,14 +151,6 @@ void s2d_text_render_bitmap(
         clmVec2     position,
         clmVec2     size,
         clmVec4     colour);
-
-/* s2d_set_texture_slot
- * --------------------
- * Set the corresponding texture slot to use texture.
- */
-void s2d_set_texture_slot(
-        u32 slot,
-        u32 texture);
 
 /* s2d_render_flush
  * ----------------

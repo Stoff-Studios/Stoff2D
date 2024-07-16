@@ -8,6 +8,6 @@ in float fTexSlot;
 uniform sampler2D uTextures[32]; 
 
 void main() {
-    int texIndex = int(fTexSlot);
-    result = fColour * texture(uTextures[texIndex], fTexCoord);
+    int texSlot = int(fTexSlot);
+    result = fColour * texture(uTextures[texSlot], fTexCoord);
 } 

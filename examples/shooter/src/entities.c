@@ -124,7 +124,7 @@ void create_bullet(clmVec2 position, clmVec2 velocity) {
         .particleEmitter = (ParticleEmitterComponent) {
             .particleType = PARTICLE_TYPE_BULLET,
             .timeUntillNextEmit = 0.0f,
-            .emitWaitTime = 0.008f
+            .emitWaitTime = 0.01f
         }
     };
 
@@ -225,7 +225,7 @@ void create_enemy(clmVec2 position) {
             .invinsibilityTimer = 0.0f
         }
     };
- 
+
     s2d_ecs_add_component(positionCmp);
     s2d_ecs_add_component(velocityCmp);
     s2d_ecs_add_component(spriteCmp);

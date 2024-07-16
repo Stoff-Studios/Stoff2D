@@ -34,8 +34,8 @@ void setup_gl_for_render_to_texture() {
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     shader = s2d_shader_create(
-            "vRendToFont.glsl",
-            "fRendToFont.glsl");
+            "engine/vRendToFont.glsl",
+            "engine/fRendToFont.glsl");
     s2d_shader_use(shader);
     glUniform3f(glGetUniformLocation(shader, "textColor"), 1.0, 1.0, 1.0);
     glActiveTexture(GL_TEXTURE0);

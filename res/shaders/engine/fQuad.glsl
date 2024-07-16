@@ -8,7 +8,14 @@ in float fTexSlot;
 uniform sampler2D uTextures[32]; 
 
 void main() {
+    vec4 result;
+
     int texSlot = int(fTexSlot);
-    vec4 result = fColour * texture(uTextures[texSlot], fTexCoord);
+    if (texSlot == 0) {
+        result = fColour;
+    } else {
+        result = fColour * texture(uTextures[texSlot], fTexCoord);
+    }
+
     FragColor = result;
 } 

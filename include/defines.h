@@ -87,9 +87,9 @@ typedef double f64;
 
 /********************************* Renderer **********************************/
 
-#define S2D_COLOURED_QUAD_TEXTURE 0x8080
+#define S2D_COLOURED_QUAD_TEXTURE 0xffffffff
 
-#define S2D_MAX_QUADS    10000 
+#define S2D_MAX_QUADS    100000 
 #define S2D_MAX_VERTICES (4 * S2D_MAX_QUADS)
 #define S2D_MAX_INDICES  (6 * S2D_MAX_QUADS)
 

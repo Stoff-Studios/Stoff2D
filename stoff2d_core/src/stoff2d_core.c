@@ -1,8 +1,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <stoff2d_core.h>
+
 #include <font.h>
 #include <utils.h>
+#include <quad_renderer.h>
 #include <stbi/stbi_image.h>
 
 #include <stdlib.h>
@@ -24,20 +27,10 @@ typedef struct {
     i32          winHeight;
     f32          aspectRatio;
 
-    // Renderer
-    u32        vao;
-    u32        vbo;
-    u32        ebo;
-    u32        quadShader;
-    u32        textShader;
-    s2dVertex  vertices[S2D_MAX_VERTICES];
-    s2dVertex* currentVertex;
-    u32        indicesCount;
-    u32        verticesCount;
-    u32        lastTexture;
-    u32        lastShader;
-    u32        whiteTex;
-    i32        maxTexSlots;
+    // Renderer and default shaders
+    QuadRenderer quadRenderer;
+    u32          quadShader;
+    u32          textShader;
 
     // Time
     f64         lastTime;
@@ -65,9 +58,7 @@ void log_stats();
 void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height);
 
 // Renderer.
-void renderer_init();
 u32  load_texture(const char* fileName);
-void render_flush(u32 shader);
 clmMat4 text_projection();
 
 // Camera.
@@ -148,36 +139,28 @@ bool s2d_initialise_engine(const char* programName) {
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &engine.maxTexSlots);
 
     // Initialise fonts.
     if (!font_init()) {
         return false;
     }
 
-    // Load white texture for coloured quads.
-    engine.whiteTex = s2d_load_texture("white.png");
-
     // Set Callbacks.
     glfwSetFramebufferSizeCallback(engine.winPtr, framebuffer_size_callback);
 
-    // Initialise Renderer.
-    renderer_init();
+    engine.quadRenderer = quad_renderer_create();
+    engine.quadShader = s2d_shader_create(
+            "engine/vQuad.glsl", "engine/fQuad.glsl");
+    engine.textShader = s2d_shader_create(
+            "engine/vText.glsl", "engine/fText.glsl");
 
-    // Load animations.
     animations_init();
-
-    // Setup the sprite renderer.
     sprite_renderer_init();
-
-    // Initialise particle system.
     particles_init();
 
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glViewport(0, 0, engine.winWidth, engine.winHeight);
 
-
-    // All is well so start the application.
     engine.flags = S2D_RUNNING;
 
     return true;
@@ -215,14 +198,12 @@ f32 s2d_start_frame() {
         s2d_unset_flags(S2D_RUNNING);
     }
 
-    // Update quad shader
-    s2d_shader_use(engine.quadShader);
-    // Projection (ortho)
+    // update default quad shader view and projection
+    // (text shader only needs updating on window resize.
     s2d_shader_set_uniform_mat4(
             engine.quadShader,
             "proj",
             s2d_camera_projection());
-    // View (lookat)
     s2d_shader_set_uniform_mat4(
             engine.quadShader,
             "view",
@@ -234,15 +215,17 @@ f32 s2d_start_frame() {
 }
 
 void s2d_end_frame() {
-    render_flush(engine.lastShader);
+    quad_renderer_flush(engine.quadRenderer);
     glfwSwapBuffers(engine.winPtr);
 
     // Log stats.
     if (s2d_check_flags(S2D_LOG_STATS) &&
             engine.logStatsTimer > S2D_LOG_STATS_INTERVAL) {
-        log_stats();
+        quad_renderer_print_stats(engine.quadRenderer);
         engine.logStatsTimer = 0.0f;
     }
+
+    quad_renderer_reset_stats(engine.quadRenderer);
 }
 
 void s2d_set_frame_cap(u32 fps) {
@@ -260,6 +243,24 @@ void s2d_set_frame_cap(u32 fps) {
     }
 }
 
+/****************************** Rendering ************************************/
+
+void s2d_render_flush() {
+    quad_renderer_flush(engine.quadRenderer);
+}
+
+void s2d_render_quad(
+        clmVec2  position,
+        clmVec2  size,
+        clmVec4  colour,
+        u32      texture,
+        s2dFrame frame,
+        u32      shader) {
+    quad_renderer_submit_quad(
+            engine.quadRenderer, position, size, colour,
+            texture, frame, shader);
+}
+
 u32 s2d_get_quad_shader() {
     return engine.quadShader;
 }
@@ -268,121 +269,9 @@ u32 s2d_get_text_shader() {
     return engine.textShader;
 }
 
-void render_flush(u32 shader) {
-    // Set shader, bind vao, fill vbo.
-    s2d_shader_use(shader);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, engine.lastTexture);
-    glBindVertexArray(engine.vao);
-    glBindVertexArray(engine.vbo);
-    glBufferSubData(
-            GL_ARRAY_BUFFER,
-            0,
-            engine.verticesCount * sizeof(s2dVertex),
-            engine.vertices);
-
-    // Render draw call.
-    glDrawElements(GL_TRIANGLES, engine.indicesCount, GL_UNSIGNED_INT, 0);
-
-    // Reset for next batch.
-    engine.verticesCount = 0;
-    engine.indicesCount  = 0;
-    engine.currentVertex = engine.vertices;
-
-    // Stats.
-    engine.drawCalls++;
-}
-
-void s2d_render_quad(
-        clmVec2  position, 
-        clmVec2  size, 
-        clmVec4  colour,
-        u32      texture,  
-        s2dFrame frame,
-        u32      shader) {
-    // Flush upon filling up the buffer or texture/shader change.
-    if (engine.verticesCount == S2D_MAX_VERTICES ||
-            engine.lastTexture != texture ||
-            engine.lastShader != shader) {
-        render_flush(engine.lastShader);
-    }
-
-    // Bottom-left.
-    engine.currentVertex->position.x = position.x;
-    engine.currentVertex->position.y = position.y;
-    engine.currentVertex->texCoord.x = frame.x;
-    engine.currentVertex->texCoord.y = frame.y;
-    engine.currentVertex->colour     = colour;
-    engine.currentVertex->texSlot    = 0.f;
-    engine.currentVertex++;
-
-    // Bottom-right.
-    engine.currentVertex->position.x = position.x + size.x;
-    engine.currentVertex->position.y = position.y;
-    engine.currentVertex->texCoord.x = frame.x + frame.w;
-    engine.currentVertex->texCoord.y = frame.y;
-    engine.currentVertex->colour     = colour;
-    engine.currentVertex->texSlot    = 0.f;
-    engine.currentVertex++;
-
-    // Top-right.
-    engine.currentVertex->position.x = position.x + size.x;
-    engine.currentVertex->position.y = position.y + size.y;
-    engine.currentVertex->texCoord.x = frame.x + frame.w;
-    engine.currentVertex->texCoord.y = frame.y + frame.h;
-    engine.currentVertex->colour     = colour;
-    engine.currentVertex->texSlot    = 0.f;
-    engine.currentVertex++;
-
-    // Top-left.
-    engine.currentVertex->position.x = position.x;
-    engine.currentVertex->position.y = position.y + size.y;
-    engine.currentVertex->texCoord.x = frame.x;
-    engine.currentVertex->texCoord.y = frame.y + frame.h;
-    engine.currentVertex->colour     = colour;
-    engine.currentVertex->texSlot    = 0.f;
-    engine.currentVertex++;
-
-    // Increment our counts and update the last added texture and batch type.
-    engine.indicesCount  += 6;
-    engine.verticesCount += 4;
-    engine.lastTexture    = texture;
-    engine.lastShader     = shader;
-}
-
-void s2d_render_coloured_quad(
-        clmVec2 position,
-        clmVec2 size,
-        clmVec4 colour) {
-    s2d_render_quad(
-            position,
-            size,
-            colour,
-            engine.whiteTex,
-            (s2dFrame) {  0.0f, 0.0f, 1.0f, 1.0f },
-            engine.quadShader);
-}
-
-void s2d_set_texture_slot(
-        u32 slot, 
-        u32 texture) {
-    if (slot >= engine.maxTexSlots) {
-        fprintf(stderr, 
-                "[S2D Warning] failed to bind texture to slot %u, exceeded "
-                "limit of %d\n", 
-                slot, engine.maxTexSlots);
-        return;
-    }
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture);
-}
-
-void s2d_render_flush() {
-    render_flush(engine.lastShader);
-}
-
 void s2d_shutdown_engine() {
     glfwDestroyWindow(engine.winPtr);
+    quad_renderer_shutdown(engine.quadRenderer);
     sprite_renderer_shutdown();
     font_shutdown();
     glfwTerminate();
@@ -398,99 +287,6 @@ void s2d_set_flags(u32 flagsToTurnOn) {
 
 void s2d_unset_flags(u32 flagsToTurnOff) {
     engine.flags &= 0xffffffff ^ flagsToTurnOff;
-}
-
-void renderer_init() {
-    // vao
-    glGenVertexArrays(1, &engine.vao); 
-    glBindVertexArray(engine.vao);
-
-    // vbo
-    glGenBuffers(1, &engine.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, engine.vbo);
-    glBufferData(
-            GL_ARRAY_BUFFER,
-            S2D_MAX_VERTICES * sizeof(s2dVertex),
-            NULL,
-            GL_DYNAMIC_DRAW);
-
-    // attribute 0, position
-    glEnableVertexAttribArray(0);  
-    glVertexAttribPointer(
-            0,                                   // attribute no.
-            2,                                   // number of elements
-            GL_FLOAT,                            // data type of the elements
-            GL_FALSE,                            // normalise
-            sizeof(s2dVertex),                      // stride
-            (void*) offsetof(s2dVertex, position)); // offset
-    // attribute 1, texCoords
-    glEnableVertexAttribArray(1);  
-    glVertexAttribPointer(
-            1,                                    // attribute no.
-            2,                                    // number of elements
-            GL_FLOAT,                             // data type of the elements
-            GL_FALSE,                             // normalise
-            sizeof(s2dVertex),                       // stride
-            (void*) offsetof(s2dVertex, texCoord));  // offset
-    // attribute 2, colour
-    glEnableVertexAttribArray(2);  
-    glVertexAttribPointer(
-            2,                                    // attribute no.
-            4,                                    // number of elements
-            GL_FLOAT,                             // data type of the elements
-            GL_FALSE,                             // normalise
-            sizeof(s2dVertex),                       // stride
-            (void*) offsetof(s2dVertex, colour));    // offset
-    // attribute 3, texSlot
-    glEnableVertexAttribArray(3);  
-    glVertexAttribPointer(
-            3,                                     // attribute no.
-            1,                                     // number of elements
-            GL_FLOAT,                              // data type of the elements
-            GL_FALSE,                              // normalise
-            sizeof(s2dVertex),                     // stride
-            (void*) offsetof(s2dVertex, texSlot)); // offset
-
-
-    // ebo
-    u32* indices = (u32*) malloc(S2D_MAX_INDICES * sizeof(u32));
-    u32 offset = 0;
-    for (u32 i = 0; i < S2D_MAX_INDICES; i += 6 ) {
-        indices[i + 0] = offset + 0; 
-        indices[i + 1] = offset + 1; 
-        indices[i + 2] = offset + 2; 
-        indices[i + 3] = offset + 2; 
-        indices[i + 4] = offset + 3; 
-        indices[i + 5] = offset + 0; 
-        offset += 4;
-    }
-    glGenBuffers(1, &engine.ebo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, engine.ebo);
-    glBufferData(
-            GL_ELEMENT_ARRAY_BUFFER,
-            S2D_MAX_INDICES * sizeof(u32),
-            indices, 
-            GL_STATIC_DRAW); 
-    free(indices);
-
-    // Unbind.
-    glBindVertexArray(0);
-
-    // Load shaders.
-    engine.quadShader = s2d_shader_create("vQuad.glsl", "fQuad.glsl");
-    engine.textShader = s2d_shader_create("vText.glsl", "fQuad.glsl");
-    s2d_shader_use(engine.textShader);
-    s2d_shader_set_uniform_mat4(
-            engine.textShader,
-            "proj",
-            text_projection());
-
-    // Batch renderer stuff.
-    engine.currentVertex = engine.vertices;
-    engine.verticesCount = 0;
-    engine.indicesCount  = 0;
-    engine.lastTexture   = 0x80808080; // garbage number.
-    engine.lastShader    = engine.quadShader;
 }
 
 u32 s2d_load_texture(const char* fileName) {
