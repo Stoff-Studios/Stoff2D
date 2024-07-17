@@ -4,7 +4,7 @@ project(Stoff2D VERSION 1.0.0)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(BUILD_EXAMPLES "build-examples" OFF)
+option(BUILD_EXAMPLES "build-examples" ON)
 
 add_subdirectory(vendor)
 add_subdirectory(stoff2d_core)

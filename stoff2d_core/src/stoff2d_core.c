@@ -153,6 +153,10 @@ bool s2d_initialise_engine(const char* programName) {
             "engine/vQuad.glsl", "engine/fQuad.glsl");
     engine.textShader = s2d_shader_create(
             "engine/vText.glsl", "engine/fQuad.glsl");
+    s2d_shader_set_uniform_mat4(
+            engine.textShader,
+            "proj",
+            text_projection());
 
     animations_init();
     sprite_renderer_init();
@@ -448,7 +452,6 @@ void framebuffer_size_callback(GLFWwindow* winPtr, i32 width, i32 height) {
     engine.winWidth  = width;
     engine.winHeight = height;
     engine.aspectRatio = ((f32) engine.winWidth) / ((f32) engine.winHeight);
-    s2d_shader_use(engine.textShader);
     s2d_shader_set_uniform_mat4(
             engine.textShader,
             "proj",

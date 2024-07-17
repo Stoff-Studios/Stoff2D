@@ -88,7 +88,7 @@ void game_init() {
         exit(1);
     }
 
-    s2d_set_frame_cap(1000);
+    s2d_set_frame_cap(S2D_FPS_UNCAPPED);
     s2d_set_flags(S2D_LOG_STATS);
 
     entites_set_game_data_ptr(&gData);

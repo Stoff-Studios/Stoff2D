@@ -2,24 +2,6 @@
 Stoff2D is a cross platform C library for making games!!
 
 ## Features and Usage
-Stoff2D is a modular collection of libraries. Each submodule can be used in
-isolation.
-
-Visit each stoff2d header to see what is available, and checkout the example projects
-in examples to see how stoff2d can be used to create a game. 
-
-To control lower level details like max entites/particles or even quads per draw
-call, have a look at include/settings.h and include/defines.h, here you can also 
-set the resource folder locations for your project.
-
-stoff2d_ecs is designed to be extended. To add your own components simply edit 
-components.h and recompile. For this reason I recommend including Stoff2D as a
-submodule.
-
-Do not remove the white texture in res/textures, this is used by the renderer to
-draw coloured quads. You can move the png as long as white.png is in the 
-S2D_TEXTURE_FOLDER location (see include/settings.h)
-
 stoff2d_core:
 - windowing and input
 - coloured/textured quad rendering 
@@ -32,10 +14,8 @@ stoff2d_ecs:
 - entity component system (see component.h)
 
 ## Dependencies
-- glfw
-
-Linux users will need some glfw dependencies, check out the
-Installing Dependencies section here if you get errors.
+Linux users will need some glfw dependencies since glfw is built as a submodule, 
+check out the "Installing Dependencies" section here if you get errors.
 https://www.glfw.org/docs/latest/compile.html
 
 ## Build
@@ -45,22 +25,24 @@ Stoff2D is built using CMake. Make sure to recursively clone.
 > cd Stoff2D
 > mkdir build
 > cd build
-> cmake ..
+> cmake -DBUILD_EXAMPLES=ON .. 
 > cmake --build .
 ```
+note the flag -DBUILD_EXAMPLES=ON, omit this when building as apart of a larger
+project if you don't care about the test programs.
 
 ## Example Projects
-To build the example projects, turn on the BUILD_EXAMPLES option when calling 
-cmake. Just add -DBUILD_EXAMPLES=ON before the source directory.
+To run the examples, call the binary built from the root directory. The res 
+folder is expected to be in the same directory that the binary was called from 
+by default. This can be changed in settings.h
 ```
-> cmake -DBUILD_EXAMPLES=ON ..
-> cmake --build .
+> build/examples/shooter/Debug/shooter.exe
+> build/examples/test/Debug/test.exe
 ```
-To run the example games, make sure the binary is called from the root
-(checkout settings.h to change resource locations).
 
-Current example games (more to come)
+Current examples
 #### Shooter
+vampire survivors type playbox
 *controls*
 - move           -> wasd
 - shoot          -> arrow-keys
@@ -72,7 +54,8 @@ Current example games (more to come)
 - fullscreen     -> f
 - windowed       -> v
 - quit           -> q
+#### test
+testbed used mainly for developing new features. Lots of particles.
 
 ## Future Plans
 - stoff2d_audio: (NEW MODULE) 
-- stoff2d_core: remove white texture and just create one on startup.

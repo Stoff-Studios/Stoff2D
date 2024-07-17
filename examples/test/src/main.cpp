@@ -13,8 +13,8 @@ int main() {
     fireParticles.count = 100;
     fireParticles.lowerLifeTime = 0.1f;
     fireParticles.upperLifeTime = 2.0f;
-    fireParticles.velocityRange = (clmVec2) { 2.0f, 500.0f };
-    fireParticles.directionRange = (clmVec2) { 0.f, 2 * CLM_PI };
+    fireParticles.velocityRange = { 2.0f, 500.0f };
+    fireParticles.directionRange = { 0.f, 2 * CLM_PI };
     fireParticles.lowerSize     = 2;
     fireParticles.upperSize     = 48;
     fireParticles.birthColour   = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -55,7 +55,7 @@ int main() {
         s2d_particles_render();
 
         s2d_text_render(
-                "zerovelo",
+                "BigBlueTerm",
                 {},
                 { 1.f, 1.f, 1.f, 1.f },
                 1.f,
