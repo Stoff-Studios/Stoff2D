@@ -100,16 +100,21 @@ f32 randf() {
 
 void s2d_particles_add(const s2dParticleType* pData, clmVec2 position) {
     // precalculate the variations for this particle type.
-    const clmVec2 velVariation = clm_v2_add(
-            pData->upperVelocity, 
-            clm_v2_scalar_mul(-1.0f, pData->lowerVelocity));
+    
+    const f32 velVariation = pData->velocityRange.y - pData->velocityRange.x;
+
+    const f32 directionVariation
+        = pData->directionRange.y - pData->directionRange.x;
+
     const clmVec4 colourChange = (clmVec4) {
         .r = pData->deathColour.r - pData->birthColour.r,
         .g = pData->deathColour.g - pData->birthColour.g,
         .b = pData->deathColour.b - pData->birthColour.b,
         .a = pData->deathColour.a - pData->birthColour.a
     };
+
     const f32 sizeVariation = pData->upperSize - pData->lowerSize;
+
     const f32 lifeTimeVariation = fabs(
             pData->upperLifeTime - pData->lowerLifeTime);
 
@@ -139,9 +144,11 @@ void s2d_particles_add(const s2dParticleType* pData, clmVec2 position) {
                 position,
                 clm_v2_scalar_mul(-0.5f, particle->size));
         // randomly set the velocity within variation specified
+        f32 speed = pData->velocityRange.x + (velVariation * randf());
+        f32 dir   = pData->directionRange.x + (directionVariation * randf());
         particle->velocity = (clmVec2) {
-            pData->lowerVelocity.x + (velVariation.x * randf()),
-            pData->lowerVelocity.y + (velVariation.y * randf())
+            .x = cosf(dir) * speed,
+            .y = sinf(dir) * speed
         };
         // current colour
         particle->currentColour = pData->birthColour;

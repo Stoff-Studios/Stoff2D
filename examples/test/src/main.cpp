@@ -13,10 +13,10 @@ int main() {
     fireParticles.count = 100;
     fireParticles.lowerLifeTime = 0.1f;
     fireParticles.upperLifeTime = 2.0f;
-    fireParticles.lowerVelocity = { -40.0f, -10.0f };
-    fireParticles.upperVelocity = {  40.0f, 80.0f };
+    fireParticles.velocityRange = (clmVec2) { 2.0f, 500.0f };
+    fireParticles.directionRange = (clmVec2) { 0.f, 2 * CLM_PI };
     fireParticles.lowerSize     = 2;
-    fireParticles.upperSize     = 64;
+    fireParticles.upperSize     = 48;
     fireParticles.birthColour   = { 1.0f, 0.0f, 0.0f, 1.0f };
     fireParticles.deathColour   = { 1.0f, 0.0f, 0.0f, 1.0f };
     fireParticles.shader        = s2d_get_quad_shader();

@@ -149,18 +149,18 @@ typedef struct {
 /******************************** Particles **********************************/
 
 typedef struct {
-    u32         count;         // number of particles to spawn per add call.
-    f32         lowerLifeTime; // lower bound for particle lifetime.
-    f32         upperLifeTime; // upper bound for particle lifetime.
-    clmVec2     lowerVelocity; // lower bound for birth velocity.
-    clmVec2     upperVelocity; // upper bound for birth velocity.
-    u32         lowerSize;     // lower bound for birth size, in pixels.
-    u32         upperSize;     // upper bound for birth size, in pixels.
-    clmVec4     birthColour;   // birth colour.
-    clmVec4     deathColour;   // death colour.
-    u32         shader;        // shader program to render particles with.
-    const char* spriteName;    // png file name in S2D_PARTICLE_SPRITES_FOLDER
-                               // (not including .png)
+    u32         count;          // number of particles to spawn per add call.
+    f32         lowerLifeTime;  // lower bound for particle lifetime.
+    f32         upperLifeTime;  // upper bound for particle lifetime.
+    clmVec2     velocityRange;  // lower and upper bound for velocity
+    clmVec2     directionRange; // angle direction range in radians 0 - 2 * PI
+    u32         lowerSize;      // lower bound for birth size, in pixels.
+    u32         upperSize;      // upper bound for birth size, in pixels.
+    clmVec4     birthColour;    // birth colour.
+    clmVec4     deathColour;    // death colour.
+    u32         shader;         // shader program to render particles with.
+    const char* spriteName;     // png file name in S2D_PARTICLE_SPRITES_FOLDER
+                                // (not including .png)
 } s2dParticleType;
 
 /*****************************************************************************/
