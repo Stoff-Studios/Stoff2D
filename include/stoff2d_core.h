@@ -93,10 +93,10 @@ u32 s2d_load_texture(const char* fileName);
 
 /* s2d_set_texture_slot
  * --------------------
- * manually assign a texture to a texture slot. The assignment persists until
- * either overriden or a call to s2d_reset_texture_slots is made
+ * binds texIDs to a texture slot in order from 1 - count, binding persists
+ * until this is called again or s2d_reset_texture_slots is called
  */
-void s2d_set_texture_slot(u32 slot, u32 texID);
+void s2d_set_texture_slots(u32 count, u32 texIDs[]);
 
 /* s2d_reset_texture_slots
  * -----------------------

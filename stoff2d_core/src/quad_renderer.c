@@ -28,16 +28,13 @@ typedef struct {
     u32 indicesCount;
     u32 verticesCount;
 
-    // each index is the slot number and maps to the texture id to be bound
-    // to that slot
-    i32 texSlots[MAX_TEXTURE_SLOTS];
+    // texture slots
+    i32 textures[MAX_TEXTURE_SLOTS];
+    i32 nextAvailableTexSlot;
+    i32 userSetTexSlotCount;
 
-    // this one is the same as texSlots, but stores overriden textures
-    // which allows users to set textures to a certain slot to support more
-    // complicated shaders which might need to sample from multiple textures
-    i32 overridenTexSlots[MAX_TEXTURE_SLOTS];
-
-    // an array of integers from 0 to MAX_TEXTURE_SLOTS - 1
+    // an array of integers from 0 to MAX_TEXTURE_SLOTS - 1, these get sent
+    // to the uTextures uniform upon new shader
     i32 samplers[MAX_TEXTURE_SLOTS];
 
     // maximum texture units available (usually 32 but varies per system)
@@ -130,41 +127,21 @@ void init_buffers(_QuadRenderer* renderer) {
 }
 
 
-// searches through texture slots for a free slot, returns MAX_TEXTURE_SLOTS if
-// there are no texture slots left
-i32 find_next_texture_slot(_QuadRenderer* renderer) {
-    for (int i = 0; i < MAX_TEXTURE_SLOTS; i++) {
-        if (renderer->texSlots[i] == EMPTY_TEXTURE_SLOT) {
-            return i;
-        }
-    }
-    return MAX_TEXTURE_SLOTS;
-}
-
-
 QuadRenderer quad_renderer_create() {
 
     _QuadRenderer* ren = malloc(sizeof(_QuadRenderer));
 
     init_buffers(ren);
 
-    ren->currentVertex = ren->vertices;
-    ren->indicesCount  = 0u;
-    ren->verticesCount = 0u;
-    ren->lastShader    = 0xffffffff;
-    ren->drawCalls     = 0u;
+    ren->currentVertex        = ren->vertices;
+    ren->indicesCount         = 0u;
+    ren->verticesCount        = 0u;
+    ren->lastShader           = 0xffffffff;
+    ren->drawCalls            = 0u;
+    ren->userSetTexSlotCount  = 0;
+    ren->nextAvailableTexSlot = 1;
+    memset(ren->textures, 0, sizeof(ren->textures));
     glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &ren->maxTexSlots);
-
-    memset(ren->texSlots, 
-           EMPTY_TEXTURE_SLOT,
-           sizeof(ren->texSlots));
-
-    memset(ren->overridenTexSlots,
-           EMPTY_TEXTURE_SLOT,
-           sizeof(ren->overridenTexSlots));
-
-    // texture slot 0 is reserved as a signal to render a coloured quad
-    ren->texSlots[0] = S2D_COLOURED_QUAD_TEXTURE;
 
     for (int i = 0; i < MAX_TEXTURE_SLOTS; i++) {
         ren->samplers[i] = i;
@@ -196,30 +173,8 @@ void quad_renderer_flush(QuadRenderer renderer) {
             ren->verticesCount * sizeof(s2dVertex),
             ren->vertices);
 
-    // bind the texture slots used
-    for (u32 slot = 1; slot < MAX_TEXTURE_SLOTS; slot++) {
-        if (ren->texSlots[slot] != EMPTY_TEXTURE_SLOT) {
-            glActiveTexture(GL_TEXTURE0 + slot);
-            glBindTexture(GL_TEXTURE_2D, (u32) ren->texSlots[slot]);
-        }
-    }
-
-    // upload sampler array to shader
-    s2d_shader_use(ren->lastShader);
-    i32 loc = glGetUniformLocation(ren->lastShader, "uTextures");
-    glUniform1iv(loc, MAX_TEXTURE_SLOTS, ren->samplers);
 
     glDrawElements(GL_TRIANGLES, ren->indicesCount, GL_UNSIGNED_INT, 0);
-
-    // reset texture slots, 0 is reserved for coloured quads and any manually
-    // set texture slots are copied back over
-    memset(ren->texSlots, EMPTY_TEXTURE_SLOT, sizeof(ren->texSlots));
-    ren->texSlots[0] = S2D_COLOURED_QUAD_TEXTURE;
-    for (int slot = 1; slot < MAX_TEXTURE_SLOTS; slot++) {
-        if (ren->overridenTexSlots[slot] != EMPTY_TEXTURE_SLOT) {
-            ren->texSlots[slot] = ren->overridenTexSlots[slot];
-        }
-    }
 
     ren->verticesCount = 0u;
     ren->indicesCount  = 0u;
@@ -239,30 +194,49 @@ void quad_renderer_submit_quad(
 
     _QuadRenderer* ren = (_QuadRenderer*) renderer;
 
-    // flush upon
-    // - vertex buffer full
-    // - shader change
-    // - exceeded texture slot limit
-    const i32 nextTexSlot = find_next_texture_slot(ren);
-    if (ren->verticesCount == S2D_MAX_VERTICES ||
-        ren->lastShader != shader ||
-        nextTexSlot >= MAX_TEXTURE_SLOTS) {
+    // flush upon vertex buffer full
+    if (ren->verticesCount == S2D_MAX_VERTICES) {
         quad_renderer_flush(renderer);
     }
 
-    // find previously allocated slot for this texture in this batch
+    // also flush if the shader changed and set up samplers
+    if (ren->lastShader != shader) {
+        quad_renderer_flush(renderer);
+        s2d_shader_use(shader);
+        i32 loc = glGetUniformLocation(shader, "uTextures");
+        glUniform1iv(loc, MAX_TEXTURE_SLOTS, ren->samplers);
+    }
+
+    // see if this texture is already bound in this batch
     f32 texSlot = EMPTY_TEXTURE_SLOT;
-    for (i32 slot = 0; slot < ren->maxTexSlots; slot++) {
-        if (ren->texSlots[slot] == texID) {
+    for (i32 slot = 0; slot < MAX_TEXTURE_SLOTS; slot++) {
+        if (ren->textures[slot] == texID) {
             texSlot = (f32) slot;
             break;
         }
     }
 
-    // if the texture isn't in this batch yet, need to assign it a slot
+    // if the texture isn't bound yet, need to assign it a slot
     if (texSlot == EMPTY_TEXTURE_SLOT) {
-        texSlot = (f32) nextTexSlot;
-        ren->texSlots[nextTexSlot] = texID;
+        // if there are no more texture slots left, need to flush
+        // and reset texture slots not set by the user
+        if (ren->nextAvailableTexSlot >= MAX_TEXTURE_SLOTS) {
+            quad_renderer_flush(renderer);
+            for (int slot = ren->userSetTexSlotCount + 1; 
+                    slot < MAX_TEXTURE_SLOTS; slot++) {
+                ren->textures[slot] = 0;
+                glActiveTexture(GL_TEXTURE0 + slot);
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+            ren->nextAvailableTexSlot = ren->userSetTexSlotCount + 1;
+        }
+
+        // assign the new texture a slot
+        texSlot = (f32) ren->nextAvailableTexSlot;
+        ren->textures[ren->nextAvailableTexSlot] = texID;
+        glActiveTexture(GL_TEXTURE0 + ren->nextAvailableTexSlot);
+        glBindTexture(GL_TEXTURE_2D, texID);
+        ren->nextAvailableTexSlot++;
     }
 
     // bottom-left
@@ -315,8 +289,14 @@ void quad_renderer_print_stats(QuadRenderer renderer) {
     printf("-------------------\n"
            "Quad Renderer Stats\n"
            "draw calls: %u\n"
+           "user set tex slot count: %d\n"
+           "next available tex slot: %d\n"
+           "max texture slots (only using 32): %d\n"
            "-------------------\n",
-           ren->drawCalls);
+           ren->drawCalls,
+           ren->userSetTexSlotCount,
+           ren->nextAvailableTexSlot,
+           ren->maxTexSlots);
 }
 
 
@@ -328,24 +308,30 @@ void quad_renderer_reset_stats(QuadRenderer renderer) {
 }
 
 
-void quad_renderer_set_texture_slot(
+void quad_renderer_set_texture_slots(
         QuadRenderer renderer,
-        u32 slot,
-        u32 texID) {
+        u32 count,
+        u32 texIDs[]) {
 
     _QuadRenderer* ren = (_QuadRenderer*) renderer;
 
-    if (slot >= MAX_TEXTURE_SLOTS || slot == 0) {
-        fprintf(stderr,
-                "[S2D Warning] failed to bind texture to slot %u, must be in"
-                " the range 1 - %d\n",
-                slot, ren->maxTexSlots - 1);
+    // need to save one automatic slot at the end
+    if (count > MAX_TEXTURE_SLOTS - 2) {
+        fprintf(stderr, "[S2D Warning] tried to bind more than 30 textures\n");
         return;
     }
 
-    // any slots set in overriden array are copied to texSlots on batch reset
-    ren->overridenTexSlots[slot] = texID;
-    ren->texSlots[slot] = texID;
+    quad_renderer_reset_texture_slots(renderer);
+
+    // bind user set textures in order
+    for (i32 slot = 0; slot < count; slot++) {
+        glActiveTexture(GL_TEXTURE0 + slot + 1);
+        glBindTexture(GL_TEXTURE_2D, texIDs[slot]);
+        ren->textures[slot + 1] = texIDs[slot];
+    }
+
+    ren->nextAvailableTexSlot = count + 1;
+    ren->userSetTexSlotCount  = count;
 }
 
 
@@ -353,7 +339,12 @@ void quad_renderer_reset_texture_slots(QuadRenderer renderer) {
 
     _QuadRenderer* ren = (_QuadRenderer*) renderer;
 
-    memset(ren->overridenTexSlots,
-           EMPTY_TEXTURE_SLOT, 
-           sizeof(ren->overridenTexSlots));
+    for (i32 slot = 0; slot < MAX_TEXTURE_SLOTS; slot++) {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        ren->textures[slot] = 0;
+    }
+
+    ren->userSetTexSlotCount  = 0;
+    ren->nextAvailableTexSlot = 1;
 }
