@@ -3,7 +3,7 @@ out vec4 FragColor;
 
 in vec2 fTexCoord;
 in vec4 fColour;
-in float fTexSlot;
+flat in float fTexSlot;
 
 uniform sampler2D uTextures[32]; 
 
