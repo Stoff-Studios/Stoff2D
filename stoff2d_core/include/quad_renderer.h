@@ -35,22 +35,6 @@ void quad_renderer_submit_quad(
         s2dFrame     texSubRegion,
         u32          shader);
 
-/* quad_renderer_set_texture_slot
- * ------------------------------
- * binds texIDs to a texture slot in order from 1 - count, binding persists
- * until this is called again or quad_renderer_reset_texture_slots is called
- */
-void quad_renderer_set_texture_slots(
-        QuadRenderer renderer,
-        u32 count,
-        u32 texIDs[]);
-
-/* quad_renderer_reset_texture_slot
- * --------------------------------
- * unbind texture slots
- */
-void quad_renderer_reset_texture_slots(QuadRenderer renderer);
-
 /* quad_renderer_print_stats
  * -------------------------
  * print renderer statistics

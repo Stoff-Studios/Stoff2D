@@ -3,11 +3,9 @@ layout(location = 0) out vec4 result;
 
 in vec2 fTexCoord;
 in vec4 fColour;
-in float fTexSlot;
 
-uniform sampler2D uTextures[32]; 
+uniform sampler2D uTexture; 
 
 void main() {
-    int texSlot = int(fTexSlot);
-    result = fColour * texture(uTextures[texSlot], fTexCoord);
+    result = fColour * texture(uTexture, fTexCoord);
 } 

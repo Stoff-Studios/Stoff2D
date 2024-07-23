@@ -91,19 +91,6 @@ void s2d_render_quad(
  */
 u32 s2d_load_texture(const char* fileName);
 
-/* s2d_set_texture_slot
- * --------------------
- * binds texIDs to a texture slot in order from 1 - count, binding persists
- * until this is called again or s2d_reset_texture_slots is called
- */
-void s2d_set_texture_slots(u32 count, u32 texIDs[]);
-
-/* s2d_reset_texture_slots
- * -----------------------
- * undo any manual assignment of texture slots
- */
-void s2d_reset_texture_slots();
-
 /* s2d_clear_colour
  * ----------------
  * Set the clear colour.

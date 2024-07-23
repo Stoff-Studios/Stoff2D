@@ -22,9 +22,6 @@ int main() {
     fireParticles.shader        = s2d_get_quad_shader();
     fireParticles.spriteName    = "circle_05";
 
-    u32 textures[3] = { tex1, tex2, tex3 };
-    s2d_set_texture_slots(3, textures);
-
     while (running) {
         s2d_start_frame();
         if (s2d_keydown(S2D_KEY_Q)) {

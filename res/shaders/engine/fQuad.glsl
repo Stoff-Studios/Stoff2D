@@ -3,19 +3,9 @@ out vec4 FragColor;
 
 in vec2 fTexCoord;
 in vec4 fColour;
-in float fTexSlot;
 
-uniform sampler2D uTextures[32]; 
+uniform sampler2D uTexture; 
 
 void main() {
-    vec4 result;
-
-    int texSlot = int(fTexSlot);
-    if (texSlot == 0) {
-        result = fColour;
-    } else {
-        result = fColour * texture(uTextures[texSlot], fTexCoord);
-    }
-
-    FragColor = result;
+    FragColor = fColour * texture(uTexture, fTexCoord);
 } 
