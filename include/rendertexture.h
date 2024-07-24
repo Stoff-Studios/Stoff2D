@@ -2,6 +2,10 @@
 
 #include <defines.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* s2d_rendertexture_create
  * ------------------------
  * Create a new framebuffer to render to.
@@ -23,3 +27,7 @@ void s2d_rendertexture_set_target(s2dRenderTexture renderTexture);
  * Set the screen to be the render target.
  */
 void s2d_rendertexture_set_target_screen();
+
+#ifdef __cplusplus
+}
+#endif
