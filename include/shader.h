@@ -59,17 +59,15 @@ void s2d_shader_set_uniform_1f(
         const char* uniformName,
         float f);
 
-/* s2d_shader_init_sampler2d_slots
- * -------------------------------
- * binds the sampler2D array with name uniformName to texture slots up to
- * the maximum allowed.
- *
- * so in the shader, uniformName[0] will access texture bound to slot 0.
- * This assumes there is a sampler2D called uniformName in the fragment shader.
+/* s2d_shader_set_sampler2d
+ * ------------------------
+ * set a sampler2d uniform
  */
-void s2d_shader_init_sampler2d(
+void s2d_shader_set_sampler2d(
         unsigned int shader, 
-        const char* uniformName);
+        const char* uniformName,
+        u32 texID,
+        u32 slot);
 
 #ifdef __cplusplus
 }

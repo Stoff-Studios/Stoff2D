@@ -130,16 +130,14 @@ void s2d_shader_set_uniform_1f(
     glUniform1f(loc, f);
 }
 
-void s2d_shader_init_sampler2d(
+void s2d_shader_set_sampler2d(
         unsigned int shader, 
-        const char* uniformName) {
+        const char* uniformName,
+        u32 texID,
+        u32 slot) {
     s2d_shader_use(shader);
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texID);
     unsigned int loc = glGetUniformLocation(shader, uniformName);
-    int maxSlots;
-    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxSlots);
-    int* samplers = malloc(sizeof(int) * maxSlots);
-    for (int i = 0; i < maxSlots; i++) {
-        samplers[i] = i;
-    }
-    glUniform1iv(loc, maxSlots, samplers);
+    glUniform1i(loc, slot);
 }

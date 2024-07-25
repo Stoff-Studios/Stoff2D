@@ -21,7 +21,7 @@ s2dRenderTexture s2d_rendertexture_create(
     glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_RGBA, // TODO: configurable
+            GL_RGBA16F, // for HDR
             textureWidth,
             textureHeight,
             0,
