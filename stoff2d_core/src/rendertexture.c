@@ -12,7 +12,7 @@ s2dRenderTexture s2d_rendertexture_create(
     // create framebuffer.
     u32 frameBuffer = 0;
     glGenFramebuffers(1, &frameBuffer);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
     // create texture.
     u32 renderTexture;
@@ -37,15 +37,7 @@ s2dRenderTexture s2d_rendertexture_create(
     glTexParameteri(
             GL_TEXTURE_2D, 
             GL_TEXTURE_MAG_FILTER, 
-            GL_NEAREST);
-    glTexParameteri(
-            GL_TEXTURE_2D, 
-            GL_TEXTURE_WRAP_S,
-            GL_CLAMP_TO_EDGE);
-    glTexParameteri(
-            GL_TEXTURE_2D, 
-            GL_TEXTURE_WRAP_T,
-            GL_CLAMP_TO_EDGE);
+            GL_LINEAR);
 
     // optional depth buffer.
     if (depthBuffer) {
@@ -86,6 +78,6 @@ s2dRenderTexture s2d_rendertexture_create(
 }
 
 void s2d_rendertexture_set_target(s2dRenderTexture renderTexture) {
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, renderTexture.frameBufferID);
+    glBindFramebuffer(GL_FRAMEBUFFER, renderTexture.frameBufferID);
     glViewport(0, 0, renderTexture.width, renderTexture.height);
 }
